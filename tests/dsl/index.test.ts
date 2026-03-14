@@ -1,9 +1,9 @@
 import { describe, it, expect } from '@jest/globals';
 import {
-  StatusLine, Pwd, Sep, Git, Branch, Insertions, Deletions,
-  Context, Tokens, Percent, Literal,
+  StatusLine, Pwd, Literal, Group,
+  GitGroup, GitBranch,
+  ContextGroup, ContextTokens, ContextPercent,
 } from '../../src/dsl/index.js';
-import type { SegmentNode } from '../../src/types.js';
 
 describe('DSL factory functions', () => {
   it('Literal creates a literal node', () => {
@@ -12,11 +12,13 @@ describe('DSL factory functions', () => {
     expect(node.props?.text).toBe('hello');
   });
 
-  it('Sep creates a separator node', () => {
-    const node = Sep({ char: '|', color: '240' });
-    expect(node.type).toBe('sep');
-    expect(node.props?.char).toBe('|');
-    expect(node.style?.color).toBe('240');
+  it('Group creates a composite with trailing closure', () => {
+    const node = Group({ prefix: ' [', suffix: ']' })(() => [
+      Literal({ text: 'a' }),
+    ]);
+    expect(node.type).toBe('group');
+    expect(node.children).toHaveLength(1);
+    expect(node.style?.prefix).toBe(' [');
   });
 
   it('Pwd creates a pwd.smart node by default', () => {
@@ -31,16 +33,16 @@ describe('DSL factory functions', () => {
     expect(node.type).toBe('pwd.name');
   });
 
-  it('Branch creates a git.branch node', () => {
-    const node = Branch({ color: 'white', prefix: '\ue0a0 ' });
+  it('GitBranch creates a git.branch node', () => {
+    const node = GitBranch({ color: 'white', prefix: '\ue0a0 ' });
     expect(node.type).toBe('git.branch');
     expect(node.provider).toBe('git');
     expect(node.style?.prefix).toBe('\ue0a0 ');
   });
 
-  it('Git creates a composite node with trailing closure', () => {
-    const node = Git()(() => [
-      Branch({ color: 'white' }),
+  it('GitGroup creates a composite with trailing closure', () => {
+    const node = GitGroup()(() => [
+      GitBranch({ color: 'white' }),
       Literal({ text: ' ' }),
     ]);
     expect(node.type).toBe('git');
@@ -48,16 +50,16 @@ describe('DSL factory functions', () => {
     expect(node.children![0].type).toBe('git.branch');
   });
 
-  it('Git accepts enabled function', () => {
+  it('GitGroup accepts enabled function', () => {
     const enabledFn = (s: any) => s.cwd !== '';
-    const node = Git({ enabled: enabledFn })(() => [Branch()]);
+    const node = GitGroup({ enabled: enabledFn })(() => [GitBranch()]);
     expect(typeof node.enabled).toBe('function');
   });
 
-  it('Context creates a composite node', () => {
-    const node = Context()(() => [
-      Tokens({ bold: true }),
-      Percent(),
+  it('ContextGroup creates a composite node', () => {
+    const node = ContextGroup()(() => [
+      ContextTokens({ bold: true }),
+      ContextPercent(),
     ]);
     expect(node.type).toBe('context');
     expect(node.children).toHaveLength(2);
@@ -66,10 +68,10 @@ describe('DSL factory functions', () => {
   it('StatusLine returns flat array of nodes', () => {
     const tree = StatusLine(() => [
       Pwd({ color: 'cyan' }),
-      Sep({ char: '|' }),
+      Literal({ text: ' | ' }),
     ]);
     expect(tree).toHaveLength(2);
     expect(tree[0].type).toBe('pwd.smart');
-    expect(tree[1].type).toBe('sep');
+    expect(tree[1].type).toBe('literal');
   });
 });

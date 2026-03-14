@@ -1,6 +1,5 @@
 import type { SegmentRegistry } from '../registry.js';
 import { literalSegment } from './literal.js';
-import { sepSegment } from './sep.js';
 import { pwdNameSegment } from './pwd.name.js';
 import { pwdPathSegment } from './pwd.path.js';
 import { pwdSmartSegment } from './pwd.smart.js';
@@ -16,7 +15,6 @@ import { costDurationSegment } from './cost.duration.js';
 
 export function registerBuiltinSegments(registry: SegmentRegistry): void {
   registry.register(literalSegment);
-  registry.register(sepSegment);
   registry.register(pwdNameSegment);
   registry.register(pwdPathSegment);
   registry.register(pwdSmartSegment);
