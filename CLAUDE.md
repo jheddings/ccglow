@@ -67,19 +67,6 @@ Use the same type prefixes as commits, followed by a short description:
 
 Examples: `feat/color-themes`, `fix/token-formatting`, `chore/update-deps`
 
-## Worktrees
-
-Use git worktrees for feature development to keep the main working directory clean.
-Worktrees live in the `.worktrees/` directory (already in `.gitignore`).
-
-```bash
-# Create a worktree for a new feature branch based on main
-git worktree add .worktrees/<name> -b <branch-name> main
-
-# Clean up after merging
-git worktree remove .worktrees/<name>
-```
-
 ## Guardrails
 
 **Do**:
