@@ -8,8 +8,8 @@ type CompositeBuilder = (sepChar: string) => SegmentNode[];
 
 const compositeBuilders: Record<string, CompositeBuilder> = {
   pwd: () => [
-    { type: 'pwd.smart', provider: 'pwd', style: { color: '#00afff' } },
-    { type: 'pwd.name', provider: 'pwd', style: { color: '#00afff', bold: true } },
+    { type: 'pwd.smart', provider: 'pwd', style: { color: 'cyanBright' } },
+    { type: 'pwd.name', provider: 'pwd', style: { color: 'cyanBright', bold: true } },
   ],
   sep: (sepChar) => [Sep({ char: sepChar, dim: true })],
   git: () => [Git()(() => [

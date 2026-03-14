@@ -5,8 +5,8 @@ import {
 import type { SegmentNode } from '../types.js';
 
 export const fullPreset: SegmentNode[] = StatusLine(() => [
-  { type: 'pwd.path', provider: 'pwd', style: { color: '#00afff' } },
-  { type: 'pwd.name', provider: 'pwd', style: { color: '#00afff', bold: true } },
+  { type: 'pwd.path', provider: 'pwd', style: { color: 'cyanBright' } },
+  { type: 'pwd.name', provider: 'pwd', style: { color: 'cyanBright', bold: true } },
   Sep({ char: '|', dim: true }),
   Git()(() => [
     Branch({ color: 'whiteBright', bold: true, icon: '\ue0a0 ' }),
