@@ -8,7 +8,8 @@ export interface ContextData {
 
 function formatTokens(total: number): string {
   if (total >= 1_000_000) {
-    return `${(total / 1_000_000).toFixed(1)}M`;
+    const val = total / 1_000_000;
+    return val % 1 === 0 ? `${val}M` : `${val.toFixed(1)}M`;
   }
   if (total >= 1_000) {
     return `${Math.round(total / 1_000)}K`;
