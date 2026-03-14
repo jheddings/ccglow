@@ -1,5 +1,5 @@
 import {
-  StatusLine, GitGroup, Group, GitBranch, GitInsertions, GitDeletions,
+  StatusLine, Group, GitGroup, GitBranch, GitInsertions, GitDeletions,
   ContextGroup, ContextTokens, ContextSize, ContextPercent, Literal,
   ModelName, CostUSD, SessionDuration, SessionLinesAdded, SessionLinesRemoved,
 } from '../dsl/index.js';
@@ -10,8 +10,8 @@ export const fullPreset: SegmentNode[] = StatusLine(() => [
   { type: 'pwd.name', provider: 'pwd', style: { color: '39', bold: true } },
   GitGroup({ prefix: ' | ', color: '240' })(() => [
     GitBranch({ color: 'whiteBright', bold: true, prefix: '\ue0a0 ' }),
-    Group({ prefix: ' [', suffix: ']' })(() => [
-      GitInsertions({ color: 'green', prefix: '+' }),
+    Group({ prefix: ' ·' })(() => [
+      GitInsertions({ color: 'green', prefix: ' +' }),
       GitDeletions({ color: 'red', prefix: ' -' }),
     ]),
   ]),
@@ -30,9 +30,8 @@ export const fullPreset: SegmentNode[] = StatusLine(() => [
   CostUSD({ color: 'yellow', bold: true }),
   { type: 'literal', props: { text: ' · ' } },
   SessionDuration({ color: 'magenta' }),
-  { type: 'literal', props: { text: ' · ' } },
-  Group()(() => [
-    SessionLinesAdded({ color: 'green', prefix: '+' }),
+  Group({ prefix: ' ·' })(() => [
+    SessionLinesAdded({ color: 'green', prefix: ' +' }),
     SessionLinesRemoved({ color: 'red', prefix: ' -' }),
   ]),
 ]);
