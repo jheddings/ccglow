@@ -21,9 +21,9 @@ const compositeBuilders: Record<string, CompositeBuilder> = {
   ])],
   context: () => [Context()(() => [
     Literal({ text: 'ctx: ' }),
-    Tokens({ bold: true }),
+    Tokens({ color: 'white', bold: true }),
     Literal({ text: ' (' }),
-    Percent(),
+    Percent({ color: 'white' }),
     Literal({ text: ')' }),
   ])],
 };
