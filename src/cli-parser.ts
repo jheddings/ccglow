@@ -1,6 +1,7 @@
 export interface CliArgs {
   preset: string;
   segments: string[];
+  sepChar: string;
   config?: string;
   format: 'ansi' | 'plain';
   tee?: string;
@@ -15,6 +16,7 @@ export function parseArgs(argv: string[]): CliArgs {
   const result: CliArgs = {
     preset: 'default',
     segments: [],
+    sepChar: '|',
     format: 'ansi',
   };
 
@@ -40,7 +42,11 @@ export function parseArgs(argv: string[]): CliArgs {
     const eqMatch = arg.match(/^--(\w[\w-]*)=(.+)$/);
     if (eqMatch) {
       const [, key, value] = eqMatch;
-      if (VALUE_FLAGS.has(key)) {
+      if (key === 'sep') {
+        // --sep=char sets the default separator and adds a sep segment
+        result.sepChar = value;
+        result.segments.push('sep');
+      } else if (VALUE_FLAGS.has(key)) {
         (result as any)[key] = value;
       }
       i++;

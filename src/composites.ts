@@ -4,9 +4,11 @@ import {
 } from './dsl/index.js';
 import type { SegmentNode } from './types.js';
 
-const compositeBuilders: Record<string, () => SegmentNode> = {
+type CompositeBuilder = (sepChar: string) => SegmentNode;
+
+const compositeBuilders: Record<string, CompositeBuilder> = {
   pwd: () => Pwd({ color: 'cyan', bold: true }),
-  sep: () => Sep({ char: '|', dim: true }),
+  sep: (sepChar) => Sep({ char: sepChar, dim: true }),
   git: () => Git()(() => [
     Branch({ color: 'white', bold: true, icon: '\ue0a0 ' }),
     Literal({ text: ' [' }),
@@ -24,8 +26,8 @@ const compositeBuilders: Record<string, () => SegmentNode> = {
   ]),
 };
 
-export function buildCompositeTree(segments: string[]): SegmentNode[] {
+export function buildCompositeTree(segments: string[], sepChar: string = '|'): SegmentNode[] {
   return segments
-    .map((name) => compositeBuilders[name]?.())
+    .map((name) => compositeBuilders[name]?.(sepChar))
     .filter((node): node is SegmentNode => node !== undefined);
 }

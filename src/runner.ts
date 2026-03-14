@@ -42,7 +42,7 @@ export async function run(args: CliArgs, stdin: string): Promise<string> {
         tree = getPreset(args.preset) ?? getPreset('default')!;
       }
     } else if (args.segments.length > 0) {
-      tree = buildCompositeTree(args.segments);
+      tree = buildCompositeTree(args.segments, args.sepChar);
     } else {
       tree = getPreset(args.preset) ?? getPreset('default')!;
     }

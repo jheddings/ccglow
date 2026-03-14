@@ -10,7 +10,7 @@ describe('run', () => {
         current_usage: { input_tokens: 38000, cache_creation_input_tokens: 2000, cache_read_input_tokens: 1500 },
       },
     });
-    const output = await run({ preset: 'default', segments: [], format: 'ansi' }, input);
+    const output = await run({ preset: 'default', segments: [], sepChar: '|', format: 'ansi' }, input);
     expect(output.length).toBeGreaterThan(0);
     // Should contain context info
     expect(output).toContain('42K');
@@ -19,13 +19,13 @@ describe('run', () => {
 
   it('renders plain format without ANSI codes', async () => {
     const input = JSON.stringify({ cwd: '/tmp' });
-    const output = await run({ preset: 'minimal', segments: [], format: 'plain' }, input);
+    const output = await run({ preset: 'minimal', segments: [], sepChar: '|', format: 'plain' }, input);
     // Plain format should not contain ANSI escape codes
     expect(output).not.toMatch(/\x1b\[/);
   });
 
   it('returns empty string for invalid stdin', async () => {
-    const output = await run({ preset: 'default', segments: [], format: 'ansi' }, 'not json');
+    const output = await run({ preset: 'default', segments: [], sepChar: '|', format: 'ansi' }, 'not json');
     expect(output).toBe('');
   });
 
@@ -34,7 +34,7 @@ describe('run', () => {
       cwd: '/tmp',
       context_window: { used_percentage: 10, current_usage: { input_tokens: 5000, cache_creation_input_tokens: 0, cache_read_input_tokens: 0 } },
     });
-    const output = await run({ preset: 'default', segments: ['context'], format: 'plain' }, input);
+    const output = await run({ preset: 'default', segments: ['context'], sepChar: '|', format: 'plain' }, input);
     expect(output).toContain('5K');
   });
 });

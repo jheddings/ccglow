@@ -66,4 +66,21 @@ describe('parseArgs', () => {
     const args = parseArgs(['--version']);
     expect(args.version).toBe(true);
   });
+
+  it('defaults sepChar to pipe', () => {
+    const args = parseArgs([]);
+    expect(args.sepChar).toBe('|');
+  });
+
+  it('--sep=char sets sepChar and adds sep segment', () => {
+    const args = parseArgs(['--pwd', '--sep=-', '--git']);
+    expect(args.sepChar).toBe('-');
+    expect(args.segments).toEqual(['pwd', 'sep', 'git']);
+  });
+
+  it('--sep=char updates sepChar for subsequent seps', () => {
+    const args = parseArgs(['--sep=-', '--sep']);
+    expect(args.sepChar).toBe('-');
+    expect(args.segments).toEqual(['sep', 'sep']);
+  });
 });
