@@ -11,7 +11,9 @@ import { contextSizeSegment } from './context.size.js';
 import { contextPercentSegment } from './context.percent.js';
 import { modelNameSegment } from './model.name.js';
 import { costUsdSegment } from './cost.usd.js';
-import { costDurationSegment } from './cost.duration.js';
+import { sessionDurationSegment } from './session.duration.js';
+import { sessionLinesAddedSegment } from './session.lines-added.js';
+import { sessionLinesRemovedSegment } from './session.lines-removed.js';
 
 export function registerBuiltinSegments(registry: SegmentRegistry): void {
   registry.register(literalSegment);
@@ -26,5 +28,7 @@ export function registerBuiltinSegments(registry: SegmentRegistry): void {
   registry.register(contextPercentSegment);
   registry.register(modelNameSegment);
   registry.register(costUsdSegment);
-  registry.register(costDurationSegment);
+  registry.register(sessionDurationSegment);
+  registry.register(sessionLinesAddedSegment);
+  registry.register(sessionLinesRemovedSegment);
 }
