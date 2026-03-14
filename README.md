@@ -49,26 +49,6 @@ npx -y ccnow --preset=minimal
 npx -y ccnow --preset=full
 ```
 
-## Segments
-
-| Segment                 | Provider | Description                       |
-| ----------------------- | -------- | --------------------------------- |
-| `pwd.name`              | pwd      | Directory basename                |
-| `pwd.path`              | pwd      | Full path prefix                  |
-| `pwd.smart`             | pwd      | Smart-truncated path prefix       |
-| `git.branch`            | git      | Current branch name               |
-| `git.insertions`        | git      | Lines added (staged + unstaged)   |
-| `git.deletions`         | git      | Lines removed (staged + unstaged) |
-| `context.tokens`        | context  | Token count (24K, 1.2M)           |
-| `context.size`          | context  | Context window capacity           |
-| `context.percent`       | context  | Usage percentage                  |
-| `model.name`            | model    | Model display name                |
-| `cost.usd`              | cost     | Session cost in USD               |
-| `session.duration`      | session  | Session wall-clock time           |
-| `session.lines-added`   | session  | Lines added this session          |
-| `session.lines-removed` | session  | Lines removed this session        |
-| `literal`               | —        | Static text                       |
-
 ## JSON Config
 
 Use `--config` for full customization:
@@ -109,6 +89,26 @@ npx -y ccnow --config ~/.claude/ccnow.json
   ]
 }
 ```
+
+## Segments
+
+| Segment                 | Provider | Description                       |
+| ----------------------- | -------- | --------------------------------- |
+| `pwd.name`              | pwd      | Directory basename                |
+| `pwd.path`              | pwd      | Full path prefix                  |
+| `pwd.smart`             | pwd      | Smart-truncated path prefix       |
+| `git.branch`            | git      | Current branch name               |
+| `git.insertions`        | git      | Lines added (staged + unstaged)   |
+| `git.deletions`         | git      | Lines removed (staged + unstaged) |
+| `context.tokens`        | context  | Token count (24K, 1.2M)           |
+| `context.size`          | context  | Context window capacity           |
+| `context.percent`       | context  | Usage percentage                  |
+| `model.name`            | model    | Model display name                |
+| `cost.usd`              | cost     | Session cost in USD               |
+| `session.duration`      | session  | Session wall-clock time           |
+| `session.lines-added`   | session  | Lines added this session          |
+| `session.lines-removed` | session  | Lines removed this session        |
+| `literal`               | —        | Static text                       |
 
 ### Colors
 
