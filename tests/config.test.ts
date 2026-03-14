@@ -23,9 +23,7 @@ describe('parseConfig', () => {
       segments: [
         {
           segment: 'git',
-          children: [
-            { segment: 'git.branch', style: { color: 'white' } },
-          ],
+          children: [{ segment: 'git.branch', style: { color: 'white' } }],
         },
       ],
     };
@@ -37,9 +35,7 @@ describe('parseConfig', () => {
 
   it('handles enabled boolean', () => {
     const json = {
-      segments: [
-        { segment: 'git', enabled: false, children: [] },
-      ],
+      segments: [{ segment: 'git', enabled: false, children: [] }],
     };
     const tree = parseConfig(json);
     expect(tree[0].enabled).toBe(false);
@@ -61,10 +57,7 @@ describe('parseConfig', () => {
 
   it('does not infer provider for literal and sep', () => {
     const json = {
-      segments: [
-        { segment: 'literal', props: { text: 'hi' } },
-        { segment: 'sep' },
-      ],
+      segments: [{ segment: 'literal', props: { text: 'hi' } }, { segment: 'sep' }],
     };
     const tree = parseConfig(json);
     expect(tree[0].provider).toBeUndefined();

@@ -1,4 +1,12 @@
-import { StatusLine, GitGroup, GitBranch, ContextGroup, ContextTokens, Literal, ContextSize } from '../dsl/index.js';
+import {
+  StatusLine,
+  GitGroup,
+  GitBranch,
+  ContextGroup,
+  ContextTokens,
+  Literal,
+  ContextSize,
+} from '../dsl/index.js';
 import type { SegmentNode } from '../types.js';
 
 export const minimalPreset: SegmentNode[] = StatusLine(() => [

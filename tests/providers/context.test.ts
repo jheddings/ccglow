@@ -8,10 +8,14 @@ describe('context provider', () => {
       cwd: '/tmp',
       context_window: {
         used_percentage: 42,
-        current_usage: { input_tokens: 38000, cache_creation_input_tokens: 2000, cache_read_input_tokens: 1500 },
+        current_usage: {
+          input_tokens: 38000,
+          cache_creation_input_tokens: 2000,
+          cache_read_input_tokens: 1500,
+        },
       },
     };
-    const data = await contextProvider.resolve(session) as any;
+    const data = (await contextProvider.resolve(session)) as any;
     expect(data.tokens).toBe('42K');
     expect(data.percent).toBe(42);
   });
@@ -21,10 +25,14 @@ describe('context provider', () => {
       cwd: '/tmp',
       context_window: {
         used_percentage: 85,
-        current_usage: { input_tokens: 1000000, cache_creation_input_tokens: 100000, cache_read_input_tokens: 100000 },
+        current_usage: {
+          input_tokens: 1000000,
+          cache_creation_input_tokens: 100000,
+          cache_read_input_tokens: 100000,
+        },
       },
     };
-    const data = await contextProvider.resolve(session) as any;
+    const data = (await contextProvider.resolve(session)) as any;
     expect(data.tokens).toBe('1.2M');
   });
 
@@ -33,16 +41,20 @@ describe('context provider', () => {
       cwd: '/tmp',
       context_window: {
         used_percentage: 1,
-        current_usage: { input_tokens: 500, cache_creation_input_tokens: 0, cache_read_input_tokens: 0 },
+        current_usage: {
+          input_tokens: 500,
+          cache_creation_input_tokens: 0,
+          cache_read_input_tokens: 0,
+        },
       },
     };
-    const data = await contextProvider.resolve(session) as any;
+    const data = (await contextProvider.resolve(session)) as any;
     expect(data.tokens).toBe('500');
   });
 
   it('returns null fields when context_window missing', async () => {
     const session: SessionData = { cwd: '/tmp' };
-    const data = await contextProvider.resolve(session) as any;
+    const data = (await contextProvider.resolve(session)) as any;
     expect(data.tokens).toBeNull();
     expect(data.percent).toBeNull();
   });

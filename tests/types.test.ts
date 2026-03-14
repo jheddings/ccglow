@@ -1,5 +1,12 @@
 import { describe, it, expect } from '@jest/globals';
-import type { SegmentNode, Segment, SegmentContext, StyleAttrs, SessionData, DataProvider } from '../src/types.js';
+import type {
+  SegmentNode,
+  Segment,
+  SegmentContext,
+  StyleAttrs,
+  SessionData,
+  DataProvider,
+} from '../src/types.js';
 
 describe('type contracts', () => {
   it('SegmentNode accepts atomic segment config', () => {

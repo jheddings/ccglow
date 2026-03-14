@@ -49,11 +49,10 @@ describe('applyStyle', () => {
     expect(result).toBe('\x1b[0m\x1b[31mhello\x1b[0m');
   });
 
-
   it('combines multiple style attrs', () => {
     const style: StyleAttrs = { color: 'green', bold: true, prefix: '+' };
     const result = applyStyle('12', style);
-    expect(result).toContain('\x1b[1m');  // bold
+    expect(result).toContain('\x1b[1m'); // bold
     expect(result).toContain('\x1b[32m'); // green
     expect(result).toContain('+12');
   });

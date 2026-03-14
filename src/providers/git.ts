@@ -34,7 +34,7 @@ export const gitProvider: DataProvider = {
       return { branch: null, insertions: null, deletions: null };
     }
 
-    const branch = await exec('git', ['branch', '--show-current'], cwd) || null;
+    const branch = (await exec('git', ['branch', '--show-current'], cwd)) || null;
 
     const diffstat = await exec('git', ['diff', '--shortstat', 'HEAD'], cwd);
     let insertions: number | null = null;

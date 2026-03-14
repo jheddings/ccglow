@@ -18,14 +18,14 @@ describe('gitAvailable', () => {
 describe('git provider', () => {
   it('resolves branch name for a git repo', async () => {
     const session: SessionData = { cwd: process.cwd() };
-    const data = await gitProvider.resolve(session) as any;
+    const data = (await gitProvider.resolve(session)) as any;
     expect(typeof data.branch).toBe('string');
     expect(data.branch.length).toBeGreaterThan(0);
   });
 
   it('returns null fields for non-git directory', async () => {
     const session: SessionData = { cwd: '/tmp' };
-    const data = await gitProvider.resolve(session) as any;
+    const data = (await gitProvider.resolve(session)) as any;
     expect(data.branch).toBeNull();
     expect(data.insertions).toBeNull();
     expect(data.deletions).toBeNull();

@@ -16,7 +16,7 @@ function renderNode(
   node: SegmentNode,
   registry: SegmentRegistry,
   session: SessionData,
-  providerData: Map<string, unknown>,
+  providerData: Map<string, unknown>
 ): string | null {
   if (!isEnabled(node, session)) return null;
 
@@ -52,7 +52,7 @@ export function renderTree(
   tree: SegmentNode[],
   registry: SegmentRegistry,
   session: SessionData,
-  providerData: Map<string, unknown>,
+  providerData: Map<string, unknown>
 ): string {
   const parts: string[] = [];
   for (const node of tree) {

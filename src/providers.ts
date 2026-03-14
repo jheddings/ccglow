@@ -21,10 +21,7 @@ export class ProviderRegistry {
     return names;
   }
 
-  async resolveAll(
-    names: string[],
-    session: SessionData,
-  ): Promise<Map<string, unknown>> {
+  async resolveAll(names: string[], session: SessionData): Promise<Map<string, unknown>> {
     const results = new Map<string, unknown>();
 
     const entries = names
@@ -35,7 +32,7 @@ export class ProviderRegistry {
       entries.map(async ({ name, provider }) => {
         const data = await provider.resolve(session);
         return { name, data };
-      }),
+      })
     );
 
     for (const result of settled) {

@@ -49,12 +49,12 @@ Add to your `~/.claude/settings.json`:
 
 ## Segments
 
-| Segment | Description |
-|---------|-------------|
-| `--pwd` | Working directory (smart-truncated) |
-| `--git` | Branch name + diff stats |
-| `--context` | Context window token usage |
-| `--sep` | Separator between segments |
+| Segment     | Description                         |
+| ----------- | ----------------------------------- |
+| `--pwd`     | Working directory (smart-truncated) |
+| `--git`     | Branch name + diff stats            |
+| `--context` | Context window token usage          |
+| `--sep`     | Separator between segments          |
 
 ## Config File Format
 
@@ -63,16 +63,19 @@ Add to your `~/.claude/settings.json`:
   "segments": [
     { "segment": "pwd.smart", "color": "cyan", "bold": true },
     { "segment": "sep", "char": "|", "dim": true },
-    { "segment": "git", "children": [
-      { "segment": "git.branch", "color": "white" },
-      { "segment": "git.insertions", "color": "green", "prefix": "+" },
-      { "segment": "git.deletions", "color": "red", "prefix": "-" }
-    ]},
+    {
+      "segment": "git",
+      "children": [
+        { "segment": "git.branch", "color": "white" },
+        { "segment": "git.insertions", "color": "green", "prefix": "+" },
+        { "segment": "git.deletions", "color": "red", "prefix": "-" }
+      ]
+    },
     { "segment": "sep", "char": "|", "dim": true },
-    { "segment": "context", "children": [
-      { "segment": "context.tokens", "bold": true },
-      { "segment": "context.percent" }
-    ]}
+    {
+      "segment": "context",
+      "children": [{ "segment": "context.tokens", "bold": true }, { "segment": "context.percent" }]
+    }
   ]
 }
 ```

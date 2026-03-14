@@ -7,7 +7,11 @@ describe('run', () => {
       cwd: process.cwd(),
       context_window: {
         used_percentage: 42,
-        current_usage: { input_tokens: 38000, cache_creation_input_tokens: 2000, cache_read_input_tokens: 1500 },
+        current_usage: {
+          input_tokens: 38000,
+          cache_creation_input_tokens: 2000,
+          cache_read_input_tokens: 1500,
+        },
       },
     });
     const output = await run({ preset: 'default', format: 'ansi' }, input);
@@ -30,7 +34,14 @@ describe('run', () => {
   it('renders non-git directory without empty separators', async () => {
     const input = JSON.stringify({
       cwd: '/tmp',
-      context_window: { used_percentage: 10, current_usage: { input_tokens: 5000, cache_creation_input_tokens: 0, cache_read_input_tokens: 0 } },
+      context_window: {
+        used_percentage: 10,
+        current_usage: {
+          input_tokens: 5000,
+          cache_creation_input_tokens: 0,
+          cache_read_input_tokens: 0,
+        },
+      },
     });
     const output = await run({ preset: 'default', format: 'plain' }, input);
     expect(output).toContain('/tmp');

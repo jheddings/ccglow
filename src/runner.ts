@@ -34,7 +34,8 @@ export async function run(args: CliArgs, stdin: string): Promise<string> {
       try {
         const configJson = JSON.parse(readFileSync(args.config, 'utf-8'));
         const configTree = parseConfig(configJson);
-        tree = configTree.length > 0 ? configTree : getPreset(args.preset) ?? getPreset('default')!;
+        tree =
+          configTree.length > 0 ? configTree : (getPreset(args.preset) ?? getPreset('default')!);
       } catch (err) {
         process.stderr.write(`ccnow: failed to load config: ${err}\n`);
         tree = getPreset(args.preset) ?? getPreset('default')!;

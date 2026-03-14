@@ -19,12 +19,19 @@ test:
 test-watch:
 	npm test -- --watch
 
-# typecheck the project
-typecheck:
+# auto-format and lint-fix
+tidy:
+	npx prettier --write .
+	npx eslint . --fix
+
+# run format, lint, and type checks (no fix)
+check:
+	npx prettier --check .
+	npx eslint .
 	npx tsc --noEmit
 
-# full preflight: build + typecheck + test
-preflight: build typecheck test
+# full preflight: build + check + test
+preflight: build check test
 
 # build and run with sample input
 dev:

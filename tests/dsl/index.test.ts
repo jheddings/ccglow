@@ -1,8 +1,14 @@
 import { describe, it, expect } from '@jest/globals';
 import {
-  StatusLine, Pwd, Literal, Group,
-  GitGroup, GitBranch,
-  ContextGroup, ContextTokens, ContextPercent,
+  StatusLine,
+  Pwd,
+  Literal,
+  Group,
+  GitGroup,
+  GitBranch,
+  ContextGroup,
+  ContextTokens,
+  ContextPercent,
 } from '../../src/dsl/index.js';
 
 describe('DSL factory functions', () => {
@@ -13,9 +19,7 @@ describe('DSL factory functions', () => {
   });
 
   it('Group creates a composite with trailing closure', () => {
-    const node = Group({ prefix: ' [', suffix: ']' })(() => [
-      Literal({ text: 'a' }),
-    ]);
+    const node = Group({ prefix: ' [', suffix: ']' })(() => [Literal({ text: 'a' })]);
     expect(node.type).toBe('group');
     expect(node.children).toHaveLength(1);
     expect(node.style?.prefix).toBe(' [');
@@ -41,10 +45,7 @@ describe('DSL factory functions', () => {
   });
 
   it('GitGroup creates a composite with trailing closure', () => {
-    const node = GitGroup()(() => [
-      GitBranch({ color: 'white' }),
-      Literal({ text: ' ' }),
-    ]);
+    const node = GitGroup()(() => [GitBranch({ color: 'white' }), Literal({ text: ' ' })]);
     expect(node.type).toBe('git');
     expect(node.children).toHaveLength(2);
     expect(node.children![0].type).toBe('git.branch');
@@ -57,19 +58,13 @@ describe('DSL factory functions', () => {
   });
 
   it('ContextGroup creates a composite node', () => {
-    const node = ContextGroup()(() => [
-      ContextTokens({ bold: true }),
-      ContextPercent(),
-    ]);
+    const node = ContextGroup()(() => [ContextTokens({ bold: true }), ContextPercent()]);
     expect(node.type).toBe('context');
     expect(node.children).toHaveLength(2);
   });
 
   it('StatusLine returns flat array of nodes', () => {
-    const tree = StatusLine(() => [
-      Pwd({ color: 'cyan' }),
-      Literal({ text: ' | ' }),
-    ]);
+    const tree = StatusLine(() => [Pwd({ color: 'cyan' }), Literal({ text: ' | ' })]);
     expect(tree).toHaveLength(2);
     expect(tree[0].type).toBe('pwd.smart');
     expect(tree[1].type).toBe('literal');

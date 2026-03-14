@@ -1,7 +1,9 @@
 import type { SegmentNode } from '../types.js';
 import { type BaseProps, type CompositeProps, extractStyle } from './primitives.js';
 
-export function GitGroup(props: CompositeProps = {}): (children: () => SegmentNode[]) => SegmentNode {
+export function GitGroup(
+  props: CompositeProps = {}
+): (children: () => SegmentNode[]) => SegmentNode {
   const { enabled, ...styleProps } = props;
   return (children) => ({
     type: 'git',

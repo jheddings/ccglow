@@ -45,12 +45,12 @@ StatusLine
 
 ```ts
 interface SegmentNode {
-  type: string;                              // e.g. 'git.branch', 'sep', 'literal'
-  provider?: string;                         // e.g. 'git' — omit if session data suffices
-  enabled?: boolean | EnabledFn;             // conditional display, defaults to true
-  style?: StyleAttrs;                        // color, bold, dim, icon, prefix, suffix
-  props?: Record<string, unknown>;           // segment-specific (text for literals, char for sep)
-  children?: SegmentNode[];                  // composites only
+  type: string; // e.g. 'git.branch', 'sep', 'literal'
+  provider?: string; // e.g. 'git' — omit if session data suffices
+  enabled?: boolean | EnabledFn; // conditional display, defaults to true
+  style?: StyleAttrs; // color, bold, dim, icon, prefix, suffix
+  props?: Record<string, unknown>; // segment-specific (text for literals, char for sep)
+  children?: SegmentNode[]; // composites only
 }
 
 type EnabledFn = (session: SessionData) => boolean;
@@ -67,19 +67,20 @@ type EnabledFn = (session: SessionData) => boolean;
 
 ```ts
 interface Segment {
-  name: string;           // matches SegmentNode.type, e.g. 'git.branch'
-  provider?: string;      // e.g. 'git'
+  name: string; // matches SegmentNode.type, e.g. 'git.branch'
+  provider?: string; // e.g. 'git'
   render(context: SegmentContext): string | null;
 }
 
 interface SegmentContext {
   session: SessionData;
-  provider?: unknown;     // cached data from the declared provider
-  props?: Record<string, unknown>;  // from SegmentNode.props (text, char, etc.)
+  provider?: unknown; // cached data from the declared provider
+  props?: Record<string, unknown>; // from SegmentNode.props (text, char, etc.)
 }
 ```
 
 At render time, the runner:
+
 1. Looks up the `Segment` implementation by `SegmentNode.type` from the registry
 2. Evaluates `SegmentNode.enabled` — if false, skips entirely (never calls `render()`)
 3. Builds a `SegmentContext` with session data, cached provider data (if declared), and the node's `props`
@@ -92,13 +93,13 @@ Segments return a raw value string or `null` (nothing to show, no data available
 
 ```ts
 interface StyleAttrs {
-  color?: string;       // 'cyan', 'red', '#ff5500'
+  color?: string; // 'cyan', 'red', '#ff5500'
   bold?: boolean;
   dim?: boolean;
   italic?: boolean;
-  icon?: string;        // prefix glyph, e.g. '\ue0a0'
-  prefix?: string;      // text before value, e.g. '+'
-  suffix?: string;      // text after value
+  icon?: string; // prefix glyph, e.g. '\ue0a0'
+  prefix?: string; // text before value, e.g. '+'
+  suffix?: string; // text after value
 }
 ```
 
@@ -121,11 +122,11 @@ Session data is parsed from stdin and passed to every segment as `SegmentContext
 
 **Built-in providers:**
 
-| Provider | Source | Data |
-|----------|--------|------|
-| `git` | git CLI commands against `session.cwd` | branch, insertions, deletions |
-| `pwd` | derived from `session.cwd` | name, path, smart-truncated path |
-| `context` | derived from session JSON | token count (formatted), percentage |
+| Provider  | Source                                 | Data                                |
+| --------- | -------------------------------------- | ----------------------------------- |
+| `git`     | git CLI commands against `session.cwd` | branch, insertions, deletions       |
+| `pwd`     | derived from `session.cwd`             | name, path, smart-truncated path    |
+| `context` | derived from session JSON              | token count (formatted), percentage |
 
 Providers are resolved lazily — only activated if an enabled segment declares them.
 
@@ -247,8 +248,19 @@ The JSON structure mirrors `SegmentNode` directly: `segment` maps to `type`, `st
 **DSL** — internal authoring format for presets, future power-user configs:
 
 ```ts
-import { StatusLine, Pwd, Sep, Git, Branch, Insertions, Deletions,
-         Context, Tokens, Percent, Literal } from 'ccnow/dsl'
+import {
+  StatusLine,
+  Pwd,
+  Sep,
+  Git,
+  Branch,
+  Insertions,
+  Deletions,
+  Context,
+  Tokens,
+  Percent,
+  Literal,
+} from 'ccnow/dsl';
 
 export default StatusLine(() => [
   Pwd({ style: 'smart', color: 'cyan', bold: true }),
@@ -269,7 +281,7 @@ export default StatusLine(() => [
     Percent(),
     Literal({ text: ')' }),
   ]),
-])
+]);
 ```
 
 The DSL and JSON both hydrate into the same render tree. Presets are named DSL files that ship with the package.
@@ -293,35 +305,35 @@ Built-in composites ship with sensible defaults (e.g. `Git` checks for git repo 
 
 ### Atomic Segments
 
-| Segment | Provider | Description |
-|---------|----------|-------------|
-| `pwd.name` | pwd | Directory basename |
-| `pwd.path` | pwd | Full path |
-| `pwd.smart` | pwd | p10k-style truncated path |
-| `git.branch` | git | Current branch name |
-| `git.insertions` | git | Lines added (staged + unstaged vs HEAD) |
-| `git.deletions` | git | Lines removed (staged + unstaged vs HEAD) |
-| `context.tokens` | context | Token count, human-formatted (24K, 1.2M) |
-| `context.percent` | context | Context window usage percentage |
-| `literal` | — | Static text string |
-| `sep` | — | Separator character (pipe, arrow, space, etc.) |
+| Segment           | Provider | Description                                    |
+| ----------------- | -------- | ---------------------------------------------- |
+| `pwd.name`        | pwd      | Directory basename                             |
+| `pwd.path`        | pwd      | Full path                                      |
+| `pwd.smart`       | pwd      | p10k-style truncated path                      |
+| `git.branch`      | git      | Current branch name                            |
+| `git.insertions`  | git      | Lines added (staged + unstaged vs HEAD)        |
+| `git.deletions`   | git      | Lines removed (staged + unstaged vs HEAD)      |
+| `context.tokens`  | context  | Token count, human-formatted (24K, 1.2M)       |
+| `context.percent` | context  | Context window usage percentage                |
+| `literal`         | —        | Static text string                             |
+| `sep`             | —        | Separator character (pipe, arrow, space, etc.) |
 
 ### Composite Segments (CLI Shorthand)
 
-| Composite | Expands To | Default `enabled` |
-|-----------|------------|-------------------|
-| `--pwd` | `pwd.smart` | always |
-| `--git` | `git.branch` `[` `git.insertions` `git.deletions` `]` | git repo available |
-| `--context` | `ctx:` `context.tokens` `(` `context.percent` `)` | always |
-| `--sep` | `sep` with default char | always |
+| Composite   | Expands To                                            | Default `enabled`  |
+| ----------- | ----------------------------------------------------- | ------------------ |
+| `--pwd`     | `pwd.smart`                                           | always             |
+| `--git`     | `git.branch` `[` `git.insertions` `git.deletions` `]` | git repo available |
+| `--context` | `ctx:` `context.tokens` `(` `context.percent` `)`     | always             |
+| `--sep`     | `sep` with default char                               | always             |
 
 ## Presets
 
-| Preset | Description |
-|--------|-------------|
+| Preset    | Description                                                 |
+| --------- | ----------------------------------------------------------- |
 | `default` | `pwd.smart \| git \| context` — mirrors existing statusline |
-| `minimal` | `pwd.name \| git.branch` |
-| `full` | All segments enabled with verbose formatting |
+| `minimal` | `pwd.name \| git.branch`                                    |
+| `full`    | All segments enabled with verbose formatting                |
 
 ## CLI Reference
 

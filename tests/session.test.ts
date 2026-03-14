@@ -7,7 +7,11 @@ describe('parseSession', () => {
       cwd: '/Users/test/project',
       context_window: {
         used_percentage: 42,
-        current_usage: { input_tokens: 38000, cache_creation_input_tokens: 2000, cache_read_input_tokens: 1500 },
+        current_usage: {
+          input_tokens: 38000,
+          cache_creation_input_tokens: 2000,
+          cache_read_input_tokens: 1500,
+        },
       },
     });
     const session = parseSession(input)!;

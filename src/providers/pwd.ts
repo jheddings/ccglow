@@ -4,8 +4,8 @@ import type { DataProvider, SessionData } from '../types.js';
 
 export interface PwdData {
   name: string;
-  path: string;   // full prefix path with trailing /, e.g. '/Users/test/' (empty for root)
-  smart: string;  // smart-truncated prefix with trailing /, e.g. '~/t/' (empty for root)
+  path: string; // full prefix path with trailing /, e.g. '/Users/test/' (empty for root)
+  smart: string; // smart-truncated prefix with trailing /, e.g. '~/t/' (empty for root)
 }
 
 const MAX_ABBREVIATED = 2;

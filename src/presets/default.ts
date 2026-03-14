@@ -1,6 +1,14 @@
 import {
-  StatusLine, Group, GitGroup, GitBranch, GitInsertions, GitDeletions,
-  ContextGroup, ContextTokens, ContextPercent, Literal,
+  StatusLine,
+  Group,
+  GitGroup,
+  GitBranch,
+  GitInsertions,
+  GitDeletions,
+  ContextGroup,
+  ContextTokens,
+  ContextPercent,
+  Literal,
   SessionDuration,
 } from '../dsl/index.js';
 import type { SegmentNode } from '../types.js';

@@ -46,7 +46,9 @@ describe('ProviderRegistry', () => {
     const reg = new ProviderRegistry();
     const failing: DataProvider = {
       name: 'fail',
-      resolve: async () => { throw new Error('boom'); },
+      resolve: async () => {
+        throw new Error('boom');
+      },
     };
     reg.register(failing);
     const results = await reg.resolveAll(['fail'], session);
@@ -58,11 +60,14 @@ describe('ProviderRegistry', () => {
     const tree: SegmentNode[] = [
       { type: 'pwd.smart', provider: 'pwd' },
       { type: 'sep' },
-      { type: 'git', children: [
-        { type: 'git.branch', provider: 'git' },
-        { type: 'literal', props: { text: ' ' } },
-        { type: 'git.insertions', provider: 'git' },
-      ]},
+      {
+        type: 'git',
+        children: [
+          { type: 'git.branch', provider: 'git' },
+          { type: 'literal', props: { text: ' ' } },
+          { type: 'git.insertions', provider: 'git' },
+        ],
+      },
     ];
     const names = reg.collectProviderNames(tree);
     expect([...names].sort()).toEqual(['git', 'pwd']);
@@ -72,9 +77,7 @@ describe('ProviderRegistry', () => {
     const reg = new ProviderRegistry();
     const tree: SegmentNode[] = [
       { type: 'pwd.smart', provider: 'pwd' },
-      { type: 'git', enabled: false, children: [
-        { type: 'git.branch', provider: 'git' },
-      ]},
+      { type: 'git', enabled: false, children: [{ type: 'git.branch', provider: 'git' }] },
     ];
     const names = reg.collectProviderNames(tree);
     expect([...names]).toEqual(['pwd']);

@@ -95,6 +95,7 @@ ccnow/
 ### Task 1: Initialize project with package.json, tsconfig, jest, justfile
 
 **Files:**
+
 - Create: `package.json`
 - Create: `tsconfig.json`
 - Create: `jest.config.ts`
@@ -244,6 +245,7 @@ git commit -m "chore: scaffold project with package.json, tsconfig, jest, justfi
 ### Task 2: Define core type interfaces
 
 **Files:**
+
 - Create: `src/types.ts`
 - Create: `tests/fixtures/session-basic.json`
 - Create: `tests/fixtures/session-full.json`
@@ -255,7 +257,14 @@ Create `tests/types.test.ts`:
 
 ```ts
 import { describe, it, expect } from '@jest/globals';
-import type { SegmentNode, Segment, SegmentContext, StyleAttrs, SessionData, DataProvider } from '../src/types.js';
+import type {
+  SegmentNode,
+  Segment,
+  SegmentContext,
+  StyleAttrs,
+  SessionData,
+  DataProvider,
+} from '../src/types.js';
 
 describe('type contracts', () => {
   it('SegmentNode accepts atomic segment config', () => {
@@ -445,6 +454,7 @@ git commit -m "feat: define core type interfaces and test fixtures"
 ### Task 3: Session parser
 
 **Files:**
+
 - Create: `src/session.ts`
 - Create: `tests/session.test.ts`
 
@@ -462,7 +472,11 @@ describe('parseSession', () => {
       cwd: '/Users/test/project',
       context_window: {
         used_percentage: 42,
-        current_usage: { input_tokens: 38000, cache_creation_input_tokens: 2000, cache_read_input_tokens: 1500 },
+        current_usage: {
+          input_tokens: 38000,
+          cache_creation_input_tokens: 2000,
+          cache_read_input_tokens: 1500,
+        },
       },
     });
     const session = parseSession(input);
@@ -543,6 +557,7 @@ git commit -m "feat: add session JSON parser with validation"
 ### Task 4: Style application
 
 **Files:**
+
 - Create: `src/style.ts`
 - Create: `tests/style.test.ts`
 
@@ -672,6 +687,7 @@ git commit -m "feat: add style application with chalk integration"
 ### Task 5: Segment registry
 
 **Files:**
+
 - Create: `src/registry.ts`
 - Create: `tests/registry.test.ts`
 
@@ -762,6 +778,7 @@ git commit -m "feat: add segment registry"
 ### Task 6: Provider resolution and caching
 
 **Files:**
+
 - Create: `src/providers.ts`
 - Create: `tests/providers.test.ts`
 
@@ -818,7 +835,9 @@ describe('ProviderRegistry', () => {
     const reg = new ProviderRegistry();
     const failing: DataProvider = {
       name: 'fail',
-      resolve: async () => { throw new Error('boom'); },
+      resolve: async () => {
+        throw new Error('boom');
+      },
     };
     reg.register(failing);
     const results = await reg.resolveAll(['fail'], session);
@@ -830,11 +849,14 @@ describe('ProviderRegistry', () => {
     const tree: SegmentNode[] = [
       { type: 'pwd.smart', provider: 'pwd' },
       { type: 'sep' },
-      { type: 'git', children: [
-        { type: 'git.branch', provider: 'git' },
-        { type: 'literal', props: { text: ' ' } },
-        { type: 'git.insertions', provider: 'git' },
-      ]},
+      {
+        type: 'git',
+        children: [
+          { type: 'git.branch', provider: 'git' },
+          { type: 'literal', props: { text: ' ' } },
+          { type: 'git.insertions', provider: 'git' },
+        ],
+      },
     ];
     const names = reg.collectProviderNames(tree);
     expect([...names].sort()).toEqual(['git', 'pwd']);
@@ -875,10 +897,7 @@ export class ProviderRegistry {
     return names;
   }
 
-  async resolveAll(
-    names: string[],
-    session: SessionData,
-  ): Promise<Map<string, unknown>> {
+  async resolveAll(names: string[], session: SessionData): Promise<Map<string, unknown>> {
     const results = new Map<string, unknown>();
 
     const entries = names
@@ -889,7 +908,7 @@ export class ProviderRegistry {
       entries.map(async ({ name, provider }) => {
         const data = await provider.resolve(session);
         return { name, data };
-      }),
+      })
     );
 
     for (const result of settled) {
@@ -920,6 +939,7 @@ git commit -m "feat: add provider registry with lazy resolution and caching"
 ### Task 7: Render tree traversal
 
 **Files:**
+
 - Create: `src/render.ts`
 - Create: `tests/render.test.ts`
 
@@ -944,15 +964,23 @@ function makeRegistry(...segments: Segment[]): SegmentRegistry {
 
 describe('renderTree', () => {
   it('renders a single atomic segment', () => {
-    const reg = makeRegistry({ name: 'literal', render: (ctx) => (ctx.props?.text as string) ?? null });
+    const reg = makeRegistry({
+      name: 'literal',
+      render: (ctx) => (ctx.props?.text as string) ?? null,
+    });
     const tree: SegmentNode[] = [{ type: 'literal', props: { text: 'hello' } }];
     const result = renderTree(tree, reg, session, providerData);
     expect(result).toBe('hello');
   });
 
   it('applies style to segment output', () => {
-    const reg = makeRegistry({ name: 'literal', render: (ctx) => (ctx.props?.text as string) ?? null });
-    const tree: SegmentNode[] = [{ type: 'literal', props: { text: 'hello' }, style: { bold: true } }];
+    const reg = makeRegistry({
+      name: 'literal',
+      render: (ctx) => (ctx.props?.text as string) ?? null,
+    });
+    const tree: SegmentNode[] = [
+      { type: 'literal', props: { text: 'hello' }, style: { bold: true } },
+    ];
     const result = renderTree(tree, reg, session, providerData);
     expect(result).toContain('hello');
     expect(result.length).toBeGreaterThan('hello'.length); // ANSI codes added
@@ -966,16 +994,26 @@ describe('renderTree', () => {
   });
 
   it('skips segments with enabled=false', () => {
-    const reg = makeRegistry({ name: 'literal', render: (ctx) => (ctx.props?.text as string) ?? null });
+    const reg = makeRegistry({
+      name: 'literal',
+      render: (ctx) => (ctx.props?.text as string) ?? null,
+    });
     const tree: SegmentNode[] = [{ type: 'literal', props: { text: 'hidden' }, enabled: false }];
     const result = renderTree(tree, reg, session, providerData);
     expect(result).toBe('');
   });
 
   it('evaluates enabled function', () => {
-    const reg = makeRegistry({ name: 'literal', render: (ctx) => (ctx.props?.text as string) ?? null });
+    const reg = makeRegistry({
+      name: 'literal',
+      render: (ctx) => (ctx.props?.text as string) ?? null,
+    });
     const tree: SegmentNode[] = [
-      { type: 'literal', props: { text: 'shown' }, enabled: (s) => s.cwd === '/Users/test/project' },
+      {
+        type: 'literal',
+        props: { text: 'shown' },
+        enabled: (s) => s.cwd === '/Users/test/project',
+      },
       { type: 'literal', props: { text: 'hidden' }, enabled: (s) => s.cwd === '/nope' },
     ];
     const result = renderTree(tree, reg, session, providerData);
@@ -983,40 +1021,47 @@ describe('renderTree', () => {
   });
 
   it('renders composite children and concatenates', () => {
-    const reg = makeRegistry({ name: 'literal', render: (ctx) => (ctx.props?.text as string) ?? null });
-    const tree: SegmentNode[] = [{
-      type: 'group',
-      children: [
-        { type: 'literal', props: { text: 'a' } },
-        { type: 'literal', props: { text: 'b' } },
-      ],
-    }];
+    const reg = makeRegistry({
+      name: 'literal',
+      render: (ctx) => (ctx.props?.text as string) ?? null,
+    });
+    const tree: SegmentNode[] = [
+      {
+        type: 'group',
+        children: [
+          { type: 'literal', props: { text: 'a' } },
+          { type: 'literal', props: { text: 'b' } },
+        ],
+      },
+    ];
     const result = renderTree(tree, reg, session, providerData);
     expect(result).toBe('ab');
   });
 
   it('collapses composite to empty when all children are null', () => {
     const reg = makeRegistry({ name: 'empty', render: () => null });
-    const tree: SegmentNode[] = [{
-      type: 'group',
-      children: [
-        { type: 'empty' },
-        { type: 'empty' },
-      ],
-    }];
+    const tree: SegmentNode[] = [
+      {
+        type: 'group',
+        children: [{ type: 'empty' }, { type: 'empty' }],
+      },
+    ];
     const result = renderTree(tree, reg, session, providerData);
     expect(result).toBe('');
   });
 
   it('collapses composite with disabled enabled flag', () => {
-    const reg = makeRegistry({ name: 'literal', render: (ctx) => (ctx.props?.text as string) ?? null });
-    const tree: SegmentNode[] = [{
-      type: 'group',
-      enabled: false,
-      children: [
-        { type: 'literal', props: { text: 'should not appear' } },
-      ],
-    }];
+    const reg = makeRegistry({
+      name: 'literal',
+      render: (ctx) => (ctx.props?.text as string) ?? null,
+    });
+    const tree: SegmentNode[] = [
+      {
+        type: 'group',
+        enabled: false,
+        children: [{ type: 'literal', props: { text: 'should not appear' } }],
+      },
+    ];
     const result = renderTree(tree, reg, session, providerData);
     expect(result).toBe('');
   });
@@ -1070,7 +1115,7 @@ function renderNode(
   node: SegmentNode,
   registry: SegmentRegistry,
   session: SessionData,
-  providerData: Map<string, unknown>,
+  providerData: Map<string, unknown>
 ): string | null {
   if (!isEnabled(node, session)) return null;
 
@@ -1106,7 +1151,7 @@ export function renderTree(
   tree: SegmentNode[],
   registry: SegmentRegistry,
   session: SessionData,
-  providerData: Map<string, unknown>,
+  providerData: Map<string, unknown>
 ): string {
   const parts: string[] = [];
   for (const node of tree) {
@@ -1136,6 +1181,7 @@ git commit -m "feat: add render tree traversal with enabled gating and style app
 ### Task 8: Literal and separator segments
 
 **Files:**
+
 - Create: `src/segments/literal.ts`
 - Create: `src/segments/sep.ts`
 - Create: `tests/segments/literal.test.ts`
@@ -1248,6 +1294,7 @@ git commit -m "feat: add literal and separator segments"
 ### Task 9: Pwd provider and segments
 
 **Files:**
+
 - Create: `src/providers/pwd.ts`
 - Create: `src/segments/pwd.name.ts`
 - Create: `src/segments/pwd.path.ts`
@@ -1267,7 +1314,7 @@ import type { SessionData } from '../../src/types.js';
 describe('pwd provider', () => {
   it('resolves name, path, and smart from cwd', async () => {
     const session: SessionData = { cwd: '/Users/jheddings/Projects/ccnow' };
-    const data = await pwdProvider.resolve(session) as any;
+    const data = (await pwdProvider.resolve(session)) as any;
     expect(data.name).toBe('ccnow');
     expect(data.path).toBe('/Users/jheddings/Projects/ccnow');
     expect(data.smart).toBeDefined();
@@ -1275,28 +1322,28 @@ describe('pwd provider', () => {
 
   it('handles root path', async () => {
     const session: SessionData = { cwd: '/' };
-    const data = await pwdProvider.resolve(session) as any;
+    const data = (await pwdProvider.resolve(session)) as any;
     expect(data.name).toBe('/');
     expect(data.path).toBe('/');
   });
 
   it('smart truncates long paths', async () => {
     const session: SessionData = { cwd: '/Users/jheddings/Projects/very/deep/nested/path' };
-    const data = await pwdProvider.resolve(session) as any;
+    const data = (await pwdProvider.resolve(session)) as any;
     expect(data.smart.length).toBeLessThan(data.path.length);
     expect(data.smart).toContain('path'); // always keeps last component
   });
 
   it('smart keeps short paths as-is', async () => {
     const session: SessionData = { cwd: '/tmp' };
-    const data = await pwdProvider.resolve(session) as any;
+    const data = (await pwdProvider.resolve(session)) as any;
     expect(data.smart).toBe('/tmp');
   });
 
   it('replaces home dir with ~ in smart', async () => {
     const home = process.env.HOME ?? '/Users/test';
     const session: SessionData = { cwd: `${home}/Projects/ccnow` };
-    const data = await pwdProvider.resolve(session) as any;
+    const data = (await pwdProvider.resolve(session)) as any;
     expect(data.smart.startsWith('~')).toBe(true);
   });
 
@@ -1469,6 +1516,7 @@ git commit -m "feat: add pwd provider and segments (name, path, smart)"
 ### Task 10: Context provider and segments
 
 **Files:**
+
 - Create: `src/providers/context.ts`
 - Create: `src/segments/context.tokens.ts`
 - Create: `src/segments/context.percent.ts`
@@ -1490,10 +1538,14 @@ describe('context provider', () => {
       cwd: '/tmp',
       context_window: {
         used_percentage: 42,
-        current_usage: { input_tokens: 38000, cache_creation_input_tokens: 2000, cache_read_input_tokens: 1500 },
+        current_usage: {
+          input_tokens: 38000,
+          cache_creation_input_tokens: 2000,
+          cache_read_input_tokens: 1500,
+        },
       },
     };
-    const data = await contextProvider.resolve(session) as any;
+    const data = (await contextProvider.resolve(session)) as any;
     expect(data.tokens).toBe('42K');
     expect(data.percent).toBe(42);
   });
@@ -1503,10 +1555,14 @@ describe('context provider', () => {
       cwd: '/tmp',
       context_window: {
         used_percentage: 85,
-        current_usage: { input_tokens: 1000000, cache_creation_input_tokens: 100000, cache_read_input_tokens: 100000 },
+        current_usage: {
+          input_tokens: 1000000,
+          cache_creation_input_tokens: 100000,
+          cache_read_input_tokens: 100000,
+        },
       },
     };
-    const data = await contextProvider.resolve(session) as any;
+    const data = (await contextProvider.resolve(session)) as any;
     expect(data.tokens).toBe('1.2M');
   });
 
@@ -1515,16 +1571,20 @@ describe('context provider', () => {
       cwd: '/tmp',
       context_window: {
         used_percentage: 1,
-        current_usage: { input_tokens: 500, cache_creation_input_tokens: 0, cache_read_input_tokens: 0 },
+        current_usage: {
+          input_tokens: 500,
+          cache_creation_input_tokens: 0,
+          cache_read_input_tokens: 0,
+        },
       },
     };
-    const data = await contextProvider.resolve(session) as any;
+    const data = (await contextProvider.resolve(session)) as any;
     expect(data.tokens).toBe('500');
   });
 
   it('returns null fields when context_window missing', async () => {
     const session: SessionData = { cwd: '/tmp' };
-    const data = await contextProvider.resolve(session) as any;
+    const data = (await contextProvider.resolve(session)) as any;
     expect(data.tokens).toBeNull();
     expect(data.percent).toBeNull();
   });
@@ -1680,6 +1740,7 @@ git commit -m "feat: add context provider and segments (tokens, percent)"
 ### Task 11: Git provider and segments
 
 **Files:**
+
 - Create: `src/providers/git.ts`
 - Create: `src/segments/git.branch.ts`
 - Create: `src/segments/git.insertions.ts`
@@ -1712,14 +1773,14 @@ describe('gitAvailable', () => {
 describe('git provider', () => {
   it('resolves branch name for a git repo', async () => {
     const session: SessionData = { cwd: process.cwd() };
-    const data = await gitProvider.resolve(session) as any;
+    const data = (await gitProvider.resolve(session)) as any;
     expect(typeof data.branch).toBe('string');
     expect(data.branch.length).toBeGreaterThan(0);
   });
 
   it('returns null fields for non-git directory', async () => {
     const session: SessionData = { cwd: '/tmp' };
-    const data = await gitProvider.resolve(session) as any;
+    const data = (await gitProvider.resolve(session)) as any;
     expect(data.branch).toBeNull();
     expect(data.insertions).toBeNull();
     expect(data.deletions).toBeNull();
@@ -1836,7 +1897,7 @@ export const gitProvider: DataProvider = {
       return { branch: null, insertions: null, deletions: null };
     }
 
-    const branch = await exec('git', ['branch', '--show-current'], cwd) || null;
+    const branch = (await exec('git', ['branch', '--show-current'], cwd)) || null;
 
     const diffstat = await exec('git', ['diff', '--shortstat', 'HEAD'], cwd);
     let insertions: number | null = null;
@@ -1923,6 +1984,7 @@ git commit -m "feat: add git provider and segments (branch, insertions, deletion
 ### Task 12: Segment and provider index files
 
 **Files:**
+
 - Create: `src/segments/index.ts`
 - Create: `src/providers/index.ts`
 
@@ -1988,6 +2050,7 @@ git commit -m "feat: add segment and provider registration index files"
 ### Task 13: DSL factory functions
 
 **Files:**
+
 - Create: `src/dsl/index.ts`
 - Create: `tests/dsl/index.test.ts`
 
@@ -1998,8 +2061,17 @@ Create `tests/dsl/index.test.ts`:
 ```ts
 import { describe, it, expect } from '@jest/globals';
 import {
-  StatusLine, Pwd, Sep, Git, Branch, Insertions, Deletions,
-  Context, Tokens, Percent, Literal,
+  StatusLine,
+  Pwd,
+  Sep,
+  Git,
+  Branch,
+  Insertions,
+  Deletions,
+  Context,
+  Tokens,
+  Percent,
+  Literal,
 } from '../../src/dsl/index.js';
 import type { SegmentNode } from '../../src/types.js';
 
@@ -2037,10 +2109,7 @@ describe('DSL factory functions', () => {
   });
 
   it('Git creates a composite node with trailing closure', () => {
-    const node = Git()(() => [
-      Branch({ color: 'white' }),
-      Literal({ text: ' ' }),
-    ]);
+    const node = Git()(() => [Branch({ color: 'white' }), Literal({ text: ' ' })]);
     expect(node.type).toBe('git');
     expect(node.children).toHaveLength(2);
     expect(node.children![0].type).toBe('git.branch');
@@ -2053,19 +2122,13 @@ describe('DSL factory functions', () => {
   });
 
   it('Context creates a composite node', () => {
-    const node = Context()(() => [
-      Tokens({ bold: true }),
-      Percent(),
-    ]);
+    const node = Context()(() => [Tokens({ bold: true }), Percent()]);
     expect(node.type).toBe('context');
     expect(node.children).toHaveLength(2);
   });
 
   it('StatusLine returns flat array of nodes', () => {
-    const tree = StatusLine(() => [
-      Pwd({ color: 'cyan' }),
-      Sep({ char: '|' }),
-    ]);
+    const tree = StatusLine(() => [Pwd({ color: 'cyan' }), Sep({ char: '|' })]);
     expect(tree).toHaveLength(2);
     expect(tree[0].type).toBe('pwd.smart');
     expect(tree[1].type).toBe('sep');
@@ -2173,7 +2236,9 @@ export function Git(props: CompositeProps = {}): (children: () => SegmentNode[])
   });
 }
 
-export function Context(props: CompositeProps = {}): (children: () => SegmentNode[]) => SegmentNode {
+export function Context(
+  props: CompositeProps = {}
+): (children: () => SegmentNode[]) => SegmentNode {
   const { enabled, ...styleProps } = props;
   return (children) => ({
     type: 'context',
@@ -2205,6 +2270,7 @@ git commit -m "feat: add DSL factory functions for composing segment trees"
 ### Task 14: Default and minimal presets
 
 **Files:**
+
 - Create: `src/presets/default.ts`
 - Create: `src/presets/minimal.ts`
 - Create: `src/presets/index.ts`
@@ -2282,8 +2348,17 @@ Create `src/presets/default.ts`:
 
 ```ts
 import {
-  StatusLine, Pwd, Sep, Git, Branch, Insertions, Deletions,
-  Context, Tokens, Percent, Literal,
+  StatusLine,
+  Pwd,
+  Sep,
+  Git,
+  Branch,
+  Insertions,
+  Deletions,
+  Context,
+  Tokens,
+  Percent,
+  Literal,
 } from '../dsl/index.js';
 import type { SegmentNode } from '../types.js';
 
@@ -2326,8 +2401,17 @@ Create `src/presets/full.ts`:
 
 ```ts
 import {
-  StatusLine, Pwd, Sep, Git, Branch, Insertions, Deletions,
-  Context, Tokens, Percent, Literal,
+  StatusLine,
+  Pwd,
+  Sep,
+  Git,
+  Branch,
+  Insertions,
+  Deletions,
+  Context,
+  Tokens,
+  Percent,
+  Literal,
 } from '../dsl/index.js';
 import type { SegmentNode } from '../types.js';
 
@@ -2393,6 +2477,7 @@ git commit -m "feat: add default, minimal, and full presets using DSL"
 ### Task 15: CLI argument parser
 
 **Files:**
+
 - Create: `src/cli-parser.ts`
 - Create: `tests/cli-parser.test.ts`
 
@@ -2581,6 +2666,7 @@ git commit -m "feat: add CLI argument parser with ordered segment flags"
 ### Task 16: JSON config loader
 
 **Files:**
+
 - Create: `src/config.ts`
 - Create: `tests/config.test.ts`
 
@@ -2614,9 +2700,7 @@ describe('parseConfig', () => {
       segments: [
         {
           segment: 'git',
-          children: [
-            { segment: 'git.branch', style: { color: 'white' } },
-          ],
+          children: [{ segment: 'git.branch', style: { color: 'white' } }],
         },
       ],
     };
@@ -2628,9 +2712,7 @@ describe('parseConfig', () => {
 
   it('handles enabled boolean', () => {
     const json = {
-      segments: [
-        { segment: 'git', enabled: false, children: [] },
-      ],
+      segments: [{ segment: 'git', enabled: false, children: [] }],
     };
     const tree = parseConfig(json);
     expect(tree[0].enabled).toBe(false);
@@ -2652,10 +2734,7 @@ describe('parseConfig', () => {
 
   it('does not infer provider for literal and sep', () => {
     const json = {
-      segments: [
-        { segment: 'literal', props: { text: 'hi' } },
-        { segment: 'sep' },
-      ],
+      segments: [{ segment: 'literal', props: { text: 'hi' } }, { segment: 'sep' }],
     };
     const tree = parseConfig(json);
     expect(tree[0].provider).toBeUndefined();
@@ -2739,6 +2818,7 @@ git commit -m "feat: add JSON config parser with provider inference"
 ### Task 17: Runner pipeline
 
 **Files:**
+
 - Create: `src/runner.ts`
 - Create: `tests/runner.test.ts`
 
@@ -2756,7 +2836,11 @@ describe('run', () => {
       cwd: process.cwd(),
       context_window: {
         used_percentage: 42,
-        current_usage: { input_tokens: 38000, cache_creation_input_tokens: 2000, cache_read_input_tokens: 1500 },
+        current_usage: {
+          input_tokens: 38000,
+          cache_creation_input_tokens: 2000,
+          cache_read_input_tokens: 1500,
+        },
       },
     });
     const output = await run({ preset: 'default', segments: [], format: 'ansi' }, input);
@@ -2781,7 +2865,14 @@ describe('run', () => {
   it('uses segment flags when provided', async () => {
     const input = JSON.stringify({
       cwd: '/tmp',
-      context_window: { used_percentage: 10, current_usage: { input_tokens: 5000, cache_creation_input_tokens: 0, cache_read_input_tokens: 0 } },
+      context_window: {
+        used_percentage: 10,
+        current_usage: {
+          input_tokens: 5000,
+          cache_creation_input_tokens: 0,
+          cache_read_input_tokens: 0,
+        },
+      },
     });
     const output = await run({ preset: 'default', segments: ['context'], format: 'plain' }, input);
     expect(output).toContain('5K');
@@ -2840,7 +2931,8 @@ export async function run(args: CliArgs, stdin: string): Promise<string> {
       try {
         const configJson = JSON.parse(readFileSync(args.config, 'utf-8'));
         const configTree = parseConfig(configJson);
-        tree = configTree.length > 0 ? configTree : getPreset(args.preset) ?? getPreset('default')!;
+        tree =
+          configTree.length > 0 ? configTree : (getPreset(args.preset) ?? getPreset('default')!);
       } catch (err) {
         process.stderr.write(`ccnow: failed to load config: ${err}\n`);
         tree = getPreset(args.preset) ?? getPreset('default')!;
@@ -2871,29 +2963,39 @@ Create `src/composites.ts`:
 
 ```ts
 import {
-  Pwd, Sep, Git, Branch, Insertions, Deletions,
-  Context, Tokens, Percent, Literal,
+  Pwd,
+  Sep,
+  Git,
+  Branch,
+  Insertions,
+  Deletions,
+  Context,
+  Tokens,
+  Percent,
+  Literal,
 } from './dsl/index.js';
 import type { SegmentNode } from './types.js';
 
 const compositeBuilders: Record<string, () => SegmentNode> = {
   pwd: () => Pwd({ color: 'cyan', bold: true }),
   sep: () => Sep({ char: '|', dim: true }),
-  git: () => Git()(() => [
-    Branch({ color: 'white', bold: true, icon: '\ue0a0 ' }),
-    Literal({ text: ' [' }),
-    Insertions({ color: 'green', prefix: '+' }),
-    Literal({ text: ' ' }),
-    Deletions({ color: 'red', prefix: '-' }),
-    Literal({ text: ']' }),
-  ]),
-  context: () => Context()(() => [
-    Literal({ text: 'ctx: ' }),
-    Tokens({ bold: true }),
-    Literal({ text: ' (' }),
-    Percent(),
-    Literal({ text: ')' }),
-  ]),
+  git: () =>
+    Git()(() => [
+      Branch({ color: 'white', bold: true, icon: '\ue0a0 ' }),
+      Literal({ text: ' [' }),
+      Insertions({ color: 'green', prefix: '+' }),
+      Literal({ text: ' ' }),
+      Deletions({ color: 'red', prefix: '-' }),
+      Literal({ text: ']' }),
+    ]),
+  context: () =>
+    Context()(() => [
+      Literal({ text: 'ctx: ' }),
+      Tokens({ bold: true }),
+      Literal({ text: ' (' }),
+      Percent(),
+      Literal({ text: ')' }),
+    ]),
 };
 
 export function buildCompositeTree(segments: string[]): SegmentNode[] {
@@ -2920,6 +3022,7 @@ git commit -m "feat: add runner pipeline with composite tree builder"
 ### Task 18: CLI entry point
 
 **Files:**
+
 - Create: `src/cli.ts`
 
 - [ ] **Step 1: Implement CLI entry point**
@@ -3006,10 +3109,12 @@ main().catch((err) => {
 - [ ] **Step 2: Build and test manually**
 
 Run:
+
 ```bash
 cd /Users/jheddings/Projects/ccnow && npx tsc
 echo '{"cwd":"/Users/jheddings/Projects/ccnow","context_window":{"used_percentage":42,"current_usage":{"input_tokens":38000,"cache_creation_input_tokens":2000,"cache_read_input_tokens":1500}}}' | node dist/cli.js
 ```
+
 Expected: styled statusline output with pwd, git info, and context stats
 
 - [ ] **Step 3: Test --help flag**
@@ -3020,17 +3125,21 @@ Expected: help text output
 - [ ] **Step 4: Test --preset=minimal**
 
 Run:
+
 ```bash
 echo '{"cwd":"/Users/jheddings/Projects/ccnow"}' | node dist/cli.js --preset=minimal
 ```
+
 Expected: shorter output with just pwd and branch
 
 - [ ] **Step 5: Test --format=plain**
 
 Run:
+
 ```bash
 echo '{"cwd":"/Users/jheddings/Projects/ccnow","context_window":{"used_percentage":42,"current_usage":{"input_tokens":38000,"cache_creation_input_tokens":2000,"cache_read_input_tokens":1500}}}' | node dist/cli.js --format=plain
 ```
+
 Expected: same content but no ANSI escape codes
 
 - [ ] **Step 6: Commit**
@@ -3056,9 +3165,11 @@ If any tests fail, fix the issues and re-run.
 - [ ] **Step 3: Final manual integration test**
 
 Run:
+
 ```bash
 echo '{"cwd":"/Users/jheddings/Projects/ccnow","context_window":{"used_percentage":42,"current_usage":{"input_tokens":38000,"cache_creation_input_tokens":2000,"cache_read_input_tokens":1500}}}' | node dist/cli.js
 ```
+
 Expected: output matches the style of the existing `~/.claude/statusline.sh`
 
 - [ ] **Step 4: Commit any fixes**
