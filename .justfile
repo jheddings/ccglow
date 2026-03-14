@@ -33,16 +33,6 @@ check:
 # full preflight: build + check + test
 preflight: build check test
 
-# build and run with sample input
-dev:
-	just build
-	echo '{"cwd":"/tmp/test","context_window":{"used_percentage":42,"current_usage":{"input_tokens":38000,"cache_creation_input_tokens":2000,"cache_read_input_tokens":1500}}}' | node dist/cli.js
-
-# build and run with tee'd session data (if available)
-dev-live:
-	just build
-	cat tmp/session.json | node dist/cli.js
-
 # remove build artifacts
 clean:
 	rm -rf dist
