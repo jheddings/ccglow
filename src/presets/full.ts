@@ -7,7 +7,7 @@ import type { SegmentNode } from '../types.js';
 export const fullPreset: SegmentNode[] = StatusLine(() => [
   { type: 'pwd.path', provider: 'pwd', style: { color: 'cyanBright' } },
   { type: 'pwd.name', provider: 'pwd', style: { color: 'cyanBright', bold: true } },
-  Sep({ char: '|', dim: true }),
+  Sep({ char: '|', color: '240' }),
   Git()(() => [
     Branch({ color: 'whiteBright', bold: true, icon: '\ue0a0 ' }),
     Group({ prefix: ' [', suffix: ']' })(() => [
@@ -15,7 +15,7 @@ export const fullPreset: SegmentNode[] = StatusLine(() => [
       Deletions({ color: 'red', prefix: ' -' }),
     ]),
   ]),
-  Sep({ char: '|', dim: true }),
+  Sep({ char: '|', color: '240' }),
   Context()(() => [
     Literal({ text: 'ctx: ' }),
     Tokens({ color: 'white', bold: true }),

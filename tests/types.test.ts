@@ -38,7 +38,6 @@ describe('type contracts', () => {
     const style: StyleAttrs = {
       color: 'cyan',
       bold: true,
-      dim: false,
       italic: true,
       icon: '\ue0a0',
       prefix: '+',

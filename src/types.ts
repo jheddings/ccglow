@@ -14,7 +14,6 @@ export interface SessionData {
 export interface StyleAttrs {
   color?: string;
   bold?: boolean;
-  dim?: boolean;
   italic?: boolean;
   icon?: string;
   prefix?: string;

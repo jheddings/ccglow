@@ -39,9 +39,9 @@ describe('applyStyle', () => {
     expect(result).toContain('hello');
   });
 
-  it('applies dim as ANSI code', () => {
-    const result = applyStyle('hello', { dim: true });
-    expect(result).toContain('\x1b[2m');
+  it('applies italic as ANSI code', () => {
+    const result = applyStyle('hello', { italic: true });
+    expect(result).toContain('\x1b[3m');
   });
 
   it('wraps styled segments with reset on both sides', () => {

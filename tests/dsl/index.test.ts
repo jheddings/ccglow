@@ -13,10 +13,10 @@ describe('DSL factory functions', () => {
   });
 
   it('Sep creates a separator node', () => {
-    const node = Sep({ char: '|', dim: true });
+    const node = Sep({ char: '|', color: '240' });
     expect(node.type).toBe('sep');
     expect(node.props?.char).toBe('|');
-    expect(node.style?.dim).toBe(true);
+    expect(node.style?.color).toBe('240');
   });
 
   it('Pwd creates a pwd.smart node by default', () => {

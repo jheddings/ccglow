@@ -22,7 +22,6 @@ const COLORS: Record<string, string> = {
 };
 
 const BOLD = '\x1b[1m';
-const DIM = '\x1b[2m';
 const ITALIC = '\x1b[3m';
 
 let colorsEnabled = true;
@@ -67,7 +66,6 @@ export function applyStyle(value: string, style: StyleAttrs | undefined): string
     // Build ANSI open sequence: reset first, then modifiers, then color
     let open = '';
     if (style.bold) open += BOLD;
-    if (style.dim) open += DIM;
     if (style.italic) open += ITALIC;
 
     if (style.color) {

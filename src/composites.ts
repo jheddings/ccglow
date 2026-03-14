@@ -11,7 +11,7 @@ const compositeBuilders: Record<string, CompositeBuilder> = {
     { type: 'pwd.smart', provider: 'pwd', style: { color: 'cyanBright' } },
     { type: 'pwd.name', provider: 'pwd', style: { color: 'cyanBright', bold: true } },
   ],
-  sep: (sepChar) => [Sep({ char: sepChar, dim: true })],
+  sep: (sepChar) => [Sep({ char: sepChar, color: '240' })],
   git: () => [Git()(() => [
     Branch({ color: 'whiteBright', bold: true, icon: '\ue0a0 ' }),
     Group({ prefix: ' [', suffix: ']' })(() => [
