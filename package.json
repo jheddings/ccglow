@@ -20,13 +20,22 @@
       "eslint"
     ]
   },
+  "files": [
+    "dist"
+  ],
   "keywords": [
     "claude",
     "claude-code",
     "statusline",
     "cli"
   ],
+  "author": "Jason Heddings",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jheddings/ccnow.git"
+  },
+  "homepage": "https://github.com/jheddings/ccnow",
   "engines": {
     "node": ">=18"
   },
