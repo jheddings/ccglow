@@ -1,6 +1,6 @@
 # ccnow
 
-A composable, spaceship-style statusline for [Claude Code](https://claude.ai/code).
+A composable, [spaceship](https://spaceship-prompt.sh)-inspired statusline for [Claude Code](https://claude.ai/code).
 
 Zero dependencies. Raw ANSI. Segment tree architecture.
 
