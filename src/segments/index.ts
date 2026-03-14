@@ -10,6 +10,9 @@ import { gitDeletionsSegment } from './git.deletions.js';
 import { contextTokensSegment } from './context.tokens.js';
 import { contextSizeSegment } from './context.size.js';
 import { contextPercentSegment } from './context.percent.js';
+import { modelNameSegment } from './model.name.js';
+import { costUsdSegment } from './cost.usd.js';
+import { costDurationSegment } from './cost.duration.js';
 
 export function registerBuiltinSegments(registry: SegmentRegistry): void {
   registry.register(literalSegment);
@@ -23,4 +26,7 @@ export function registerBuiltinSegments(registry: SegmentRegistry): void {
   registry.register(contextTokensSegment);
   registry.register(contextSizeSegment);
   registry.register(contextPercentSegment);
+  registry.register(modelNameSegment);
+  registry.register(costUsdSegment);
+  registry.register(costDurationSegment);
 }

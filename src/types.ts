@@ -1,5 +1,16 @@
 export interface SessionData {
   cwd: string;
+  model?: {
+    id: string;
+    display_name: string;
+  };
+  cost?: {
+    total_cost_usd: number;
+    total_duration_ms: number;
+    total_api_duration_ms: number;
+    total_lines_added: number;
+    total_lines_removed: number;
+  };
   context_window?: {
     used_percentage: number;
     context_window_size?: number;

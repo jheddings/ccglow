@@ -103,6 +103,21 @@ export function Context(props: CompositeProps = {}): (children: () => SegmentNod
   });
 }
 
+export function ModelName(props: BaseProps = {}): SegmentNode {
+  const { enabled, ...styleProps } = props;
+  return { type: 'model.name', provider: 'model', enabled, style: extractStyle(styleProps) };
+}
+
+export function CostUsd(props: BaseProps = {}): SegmentNode {
+  const { enabled, ...styleProps } = props;
+  return { type: 'cost.usd', provider: 'cost', enabled, style: extractStyle(styleProps) };
+}
+
+export function CostDuration(props: BaseProps = {}): SegmentNode {
+  const { enabled, ...styleProps } = props;
+  return { type: 'cost.duration', provider: 'cost', enabled, style: extractStyle(styleProps) };
+}
+
 export function Group(props: CompositeProps = {}): (children: () => SegmentNode[]) => SegmentNode {
   const { enabled, ...styleProps } = props;
   return (children) => ({
