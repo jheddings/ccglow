@@ -1,7 +1,5 @@
 export interface CliArgs {
   preset: string;
-  segments: string[];
-  sepChar: string;
   config?: string;
   format: 'ansi' | 'plain';
   tee?: string;
@@ -9,18 +7,14 @@ export interface CliArgs {
   version?: boolean;
 }
 
-const SEGMENT_FLAGS = new Set(['pwd', 'git', 'context', 'sep']);
 const VALUE_FLAGS = new Set(['preset', 'config', 'format', 'tee']);
 
 export function parseArgs(argv: string[]): CliArgs {
   const result: CliArgs = {
     preset: 'default',
-    segments: [],
-    sepChar: '|',
     format: 'ansi',
   };
 
-  const seenComposites = new Set<string>();
   let i = 0;
 
   while (i < argv.length) {
@@ -42,11 +36,7 @@ export function parseArgs(argv: string[]): CliArgs {
     const eqMatch = arg.match(/^--(\w[\w-]*)=(.+)$/);
     if (eqMatch) {
       const [, key, value] = eqMatch;
-      if (key === 'sep') {
-        // --sep=char sets the default separator and adds a sep segment
-        result.sepChar = value;
-        result.segments.push('sep');
-      } else if (VALUE_FLAGS.has(key)) {
+      if (VALUE_FLAGS.has(key)) {
         (result as any)[key] = value;
       }
       i++;
@@ -64,14 +54,6 @@ export function parseArgs(argv: string[]): CliArgs {
           (result as any)[key] = value;
           i += 2;
           continue;
-        }
-      }
-
-      if (SEGMENT_FLAGS.has(key)) {
-        // sep is always allowed as duplicate
-        if (key === 'sep' || !seenComposites.has(key)) {
-          result.segments.push(key);
-          if (key !== 'sep') seenComposites.add(key);
         }
       }
 

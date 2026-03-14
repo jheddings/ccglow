@@ -12,10 +12,6 @@ Reads session JSON from stdin, outputs styled statusline to stdout.
 Options:
   --preset <name>     Use a named preset (default, minimal, full)
   --config <path>     Load JSON config file
-  --pwd               Enable pwd composite segment
-  --git               Enable git composite segment
-  --context           Enable context composite segment
-  --sep               Insert separator segment
   --format <type>     Output format: ansi (default), plain
   --tee <path>        Write raw stdin JSON to file before processing
   --help              Show help
@@ -24,7 +20,6 @@ Options:
 Examples:
   npx -y ccnow
   npx -y ccnow --preset=minimal
-  npx -y ccnow --pwd --sep --git --sep --context
   npx -y ccnow --config ~/.claude/ccnow.json
 `;
 

@@ -9,7 +9,6 @@ import { registerBuiltinSegments } from './segments/index.js';
 import { registerBuiltinProviders } from './providers/index.js';
 import { renderTree } from './render.js';
 import { getPreset } from './presets/index.js';
-import { buildCompositeTree } from './composites.js';
 import { setColorLevel } from './style.js';
 
 export async function run(args: CliArgs, stdin: string): Promise<string> {
@@ -17,9 +16,8 @@ export async function run(args: CliArgs, stdin: string): Promise<string> {
   const session = parseSession(stdin);
   if (!session) return '';
 
-  // Set chalk level based on format (save and restore to avoid global mutation)
-  const originalLevel: 0 | 1 | 2 | 3 = args.format === 'plain' ? 0 : 3;
-  setColorLevel(originalLevel);
+  // Set color level based on format
+  setColorLevel(args.format === 'plain' ? 0 : 1);
 
   try {
     // Build registries
@@ -29,7 +27,7 @@ export async function run(args: CliArgs, stdin: string): Promise<string> {
     const providerRegistry = new ProviderRegistry();
     registerBuiltinProviders(providerRegistry);
 
-    // Resolve render tree: config file > CLI segment flags > preset
+    // Resolve render tree: config file > preset
     let tree: SegmentNode[];
 
     if (args.config) {
@@ -41,8 +39,6 @@ export async function run(args: CliArgs, stdin: string): Promise<string> {
         process.stderr.write(`ccnow: failed to load config: ${err}\n`);
         tree = getPreset(args.preset) ?? getPreset('default')!;
       }
-    } else if (args.segments.length > 0) {
-      tree = buildCompositeTree(args.segments, args.sepChar);
     } else {
       tree = getPreset(args.preset) ?? getPreset('default')!;
     }
@@ -54,7 +50,6 @@ export async function run(args: CliArgs, stdin: string): Promise<string> {
     // Render
     return renderTree(tree, segmentRegistry, session, providerData);
   } finally {
-    // Restore color level to full after render
-    setColorLevel(3);
+    setColorLevel(1);
   }
 }
