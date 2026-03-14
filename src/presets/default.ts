@@ -5,18 +5,16 @@ import {
 import type { SegmentNode } from '../types.js';
 
 export const defaultPreset: SegmentNode[] = StatusLine(() => [
-  { type: 'pwd.smart', provider: 'pwd', style: { color: '31', suffix: '/' } },
+  { type: 'pwd.smart', provider: 'pwd', style: { color: '31' } },
   { type: 'pwd.name', provider: 'pwd', style: { color: '39', bold: true } },
-  Sep({ char: '|', color: '240' }),
-  Git()(() => [
+  Git({ prefix: ' | ', color: '240' })(() => [
     Branch({ color: 'whiteBright', bold: true, icon: '\ue0a0 ' }),
     Group({ prefix: ' [', suffix: ']' })(() => [
       Insertions({ color: 'green', prefix: '+' }),
       Deletions({ color: 'red', prefix: ' -' }),
     ]),
   ]),
-  Sep({ char: '|', color: '240' }),
-  Context()(() => [
+  Context({ prefix: ' | ', color: '240' })(() => [
     Literal({ text: 'ctx: ' }),
     Tokens({ color: 'white', bold: true }),
     Literal({ text: ' (' }),
