@@ -109,4 +109,111 @@ describe('renderTree', () => {
     const result = renderTree(tree, reg, session, providerData);
     expect(result).toBe('');
   });
+
+  it('collapses composite with prefix/suffix when all children are null', () => {
+    const reg = makeRegistry({ name: 'empty', render: () => null });
+    const tree: SegmentNode[] = [{
+      type: 'group',
+      style: { prefix: ' [', suffix: ']' },
+      children: [
+        { type: 'empty' },
+        { type: 'empty' },
+      ],
+    }];
+    const result = renderTree(tree, reg, session, providerData);
+    expect(result).toBe('');
+  });
+
+  it('renders composite prefix/suffix when children have data', () => {
+    const reg = makeRegistry({ name: 'val', render: () => '5' });
+    const tree: SegmentNode[] = [{
+      type: 'group',
+      style: { prefix: ' [', suffix: ']' },
+      children: [
+        { type: 'val' },
+      ],
+    }];
+    const result = renderTree(tree, reg, session, providerData);
+    expect(result).toBe(' [5]');
+  });
+
+  it('renders git composite without brackets when diff is clean', () => {
+    const gitData = { branch: 'main', insertions: 0, deletions: 0 };
+    const providers = new Map<string, unknown>([['git', gitData]]);
+    const reg = makeRegistry(
+      { name: 'git.branch', provider: 'git', render: (ctx) => (ctx.provider as any)?.branch ?? null },
+      { name: 'git.insertions', provider: 'git', render: (ctx) => { const d = ctx.provider as any; return d?.insertions ? `${d.insertions}` : null; } },
+      { name: 'git.deletions', provider: 'git', render: (ctx) => { const d = ctx.provider as any; return d?.deletions ? `${d.deletions}` : null; } },
+    );
+    const tree: SegmentNode[] = [{
+      type: 'git',
+      children: [
+        { type: 'git.branch', provider: 'git', style: { icon: '\ue0a0 ' } },
+        {
+          type: 'group',
+          style: { prefix: ' [', suffix: ']' },
+          children: [
+            { type: 'git.insertions', provider: 'git', style: { prefix: '+' } },
+            { type: 'git.deletions', provider: 'git', style: { prefix: ' -' } },
+          ],
+        },
+      ],
+    }];
+    const result = renderTree(tree, reg, session, providers);
+    expect(result).toBe('\ue0a0 main');
+    expect(result).not.toContain('[');
+    expect(result).not.toContain(']');
+  });
+
+  it('renders git composite with brackets when diff has changes', () => {
+    const gitData = { branch: 'feat/test', insertions: 10, deletions: 3 };
+    const providers = new Map<string, unknown>([['git', gitData]]);
+    const reg = makeRegistry(
+      { name: 'git.branch', provider: 'git', render: (ctx) => (ctx.provider as any)?.branch ?? null },
+      { name: 'git.insertions', provider: 'git', render: (ctx) => { const d = ctx.provider as any; return d?.insertions ? `${d.insertions}` : null; } },
+      { name: 'git.deletions', provider: 'git', render: (ctx) => { const d = ctx.provider as any; return d?.deletions ? `${d.deletions}` : null; } },
+    );
+    const tree: SegmentNode[] = [{
+      type: 'git',
+      children: [
+        { type: 'git.branch', provider: 'git' },
+        {
+          type: 'group',
+          style: { prefix: ' [', suffix: ']' },
+          children: [
+            { type: 'git.insertions', provider: 'git', style: { prefix: '+' } },
+            { type: 'git.deletions', provider: 'git', style: { prefix: ' -' } },
+          ],
+        },
+      ],
+    }];
+    const result = renderTree(tree, reg, session, providers);
+    expect(result).toBe('feat/test [+10 -3]');
+  });
+
+  it('renders git composite with only insertions', () => {
+    const gitData = { branch: 'main', insertions: 7, deletions: 0 };
+    const providers = new Map<string, unknown>([['git', gitData]]);
+    const reg = makeRegistry(
+      { name: 'git.branch', provider: 'git', render: (ctx) => (ctx.provider as any)?.branch ?? null },
+      { name: 'git.insertions', provider: 'git', render: (ctx) => { const d = ctx.provider as any; return d?.insertions ? `${d.insertions}` : null; } },
+      { name: 'git.deletions', provider: 'git', render: (ctx) => { const d = ctx.provider as any; return d?.deletions ? `${d.deletions}` : null; } },
+    );
+    const tree: SegmentNode[] = [{
+      type: 'git',
+      children: [
+        { type: 'git.branch', provider: 'git' },
+        {
+          type: 'group',
+          style: { prefix: ' [', suffix: ']' },
+          children: [
+            { type: 'git.insertions', provider: 'git', style: { prefix: '+' } },
+            { type: 'git.deletions', provider: 'git', style: { prefix: ' -' } },
+          ],
+        },
+      ],
+    }];
+    const result = renderTree(tree, reg, session, providers);
+    expect(result).toBe('main [+7]');
+  });
 });
