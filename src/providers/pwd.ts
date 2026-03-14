@@ -8,6 +8,8 @@ export interface PwdData {
   smart: string;
 }
 
+const MAX_ABBREVIATED = 2;
+
 function smartTruncate(cwd: string): string {
   const home = os.homedir();
   let p = cwd;
@@ -18,14 +20,23 @@ function smartTruncate(cwd: string): string {
   }
 
   const parts = p.split('/');
+  // 3 or fewer segments (e.g. ~/Projects/ccnow) — keep as-is
   if (parts.length <= 3) return p;
 
-  // Keep first component and last component, truncate middle to initials
   const first = parts[0]; // '' for absolute, '~' for home-relative
   const last = parts[parts.length - 1];
-  const middle = parts.slice(1, -1).map((part) => part[0] ?? '');
+  const middle = parts.slice(1, -1);
 
-  return [first, ...middle, last].join('/');
+  // Abbreviate up to MAX_ABBREVIATED middle segments, then ellipsis if more remain
+  if (middle.length <= MAX_ABBREVIATED) {
+    // All middle segments fit as abbreviations (e.g. ~/P/r/red)
+    const abbreviated = middle.map((part) => part[0] ?? '');
+    return [first, ...abbreviated, last].join('/');
+  }
+
+  // More than MAX_ABBREVIATED middle segments — abbreviate first 2, then …
+  const abbreviated = middle.slice(0, MAX_ABBREVIATED).map((part) => part[0] ?? '');
+  return [first, ...abbreviated, '\u2026', last].join('/');
 }
 
 export const pwdProvider: DataProvider = {

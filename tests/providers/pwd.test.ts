@@ -18,24 +18,44 @@ describe('pwd provider', () => {
     expect(data.path).toBe('/');
   });
 
-  it('smart truncates long paths', async () => {
-    const session: SessionData = { cwd: '/Users/jheddings/Projects/very/deep/nested/path' };
-    const data = await pwdProvider.resolve(session) as any;
-    expect(data.smart.length).toBeLessThan(data.path.length);
-    expect(data.smart).toContain('path'); // always keeps last component
-  });
-
   it('smart keeps short paths as-is', async () => {
     const session: SessionData = { cwd: '/tmp' };
     const data = await pwdProvider.resolve(session) as any;
     expect(data.smart).toBe('/tmp');
   });
 
-  it('replaces home dir with ~ in smart', async () => {
+  it('smart keeps 3-segment home paths as-is', async () => {
     const home = process.env.HOME ?? '/Users/test';
     const session: SessionData = { cwd: `${home}/Projects/ccnow` };
     const data = await pwdProvider.resolve(session) as any;
-    expect(data.smart.startsWith('~')).toBe(true);
+    expect(data.smart).toBe('~/Projects/ccnow');
+  });
+
+  it('smart abbreviates 2 middle segments then ellipsis for deep paths', async () => {
+    const home = process.env.HOME ?? '/Users/test';
+    const session: SessionData = { cwd: `${home}/Projects/rise/red/app/routes/virtual-events` };
+    const data = await pwdProvider.resolve(session) as any;
+    expect(data.smart).toBe('~/P/r/\u2026/virtual-events');
+  });
+
+  it('smart abbreviates 4-segment home path without ellipsis', async () => {
+    const home = process.env.HOME ?? '/Users/test';
+    const session: SessionData = { cwd: `${home}/Projects/rise/red` };
+    const data = await pwdProvider.resolve(session) as any;
+    expect(data.smart).toBe('~/P/r/red');
+  });
+
+  it('smart handles 5-segment home path with ellipsis', async () => {
+    const home = process.env.HOME ?? '/Users/test';
+    const session: SessionData = { cwd: `${home}/Projects/rise/red/app` };
+    const data = await pwdProvider.resolve(session) as any;
+    expect(data.smart).toBe('~/P/r/\u2026/app');
+  });
+
+  it('smart handles absolute non-home deep paths', async () => {
+    const session: SessionData = { cwd: '/usr/local/share/some/deep/path' };
+    const data = await pwdProvider.resolve(session) as any;
+    expect(data.smart).toBe('/u/l/\u2026/path');
   });
 
   it('has correct name', () => {
