@@ -50,6 +50,62 @@ func TestFormatDuration(t *testing.T) {
 	}
 }
 
+func TestContextProviderRemaining(t *testing.T) {
+	p := &contextProvider{}
+	sess := &types.SessionData{
+		CWD: "/tmp",
+		ContextWindow: &types.ContextWindow{
+			UsedPercentage:      36,
+			RemainingPercentage: 64,
+			ContextWindowSize:   1000000,
+			CurrentUsage:        &types.CurrentUsage{InputTokens: 100},
+		},
+	}
+
+	result, err := p.Resolve(sess)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	data := result.(*ContextData)
+	if data.Remaining == nil || *data.Remaining != 64 {
+		t.Errorf("expected remaining 64, got %v", data.Remaining)
+	}
+}
+
+func TestContextProviderNoRemaining(t *testing.T) {
+	p := &contextProvider{}
+	sess := &types.SessionData{CWD: "/tmp"}
+
+	result, err := p.Resolve(sess)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	data := result.(*ContextData)
+	if data.Remaining != nil {
+		t.Errorf("expected nil remaining, got %v", data.Remaining)
+	}
+}
+
+func TestContextProviderZeroRemaining(t *testing.T) {
+	p := &contextProvider{}
+	sess := &types.SessionData{
+		CWD:           "/tmp",
+		ContextWindow: &types.ContextWindow{},
+	}
+
+	result, err := p.Resolve(sess)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	data := result.(*ContextData)
+	if data.Remaining != nil {
+		t.Errorf("expected nil remaining for zero value with no usage, got %v", data.Remaining)
+	}
+}
+
 func TestContextProvider(t *testing.T) {
 	p := &contextProvider{}
 	sess := &types.SessionData{
