@@ -49,17 +49,12 @@ func renderNode(
 		return &styled
 	}
 
-	// LiteralSegment: delegate to registered segment
+	// Built-in segment: delegate to registered segment (literal, newline)
 	seg := segments.Get(node.Type)
 	if seg != nil {
 		ctx := &types.SegmentContext{
 			Session: session,
 			Props:   node.Props,
-		}
-		if node.Provider != "" {
-			if data, ok := providerData[node.Provider]; ok {
-				ctx.Provider = data
-			}
 		}
 
 		value := seg.Render(ctx)
@@ -128,9 +123,6 @@ func collectNames(nodes []types.SegmentNode, names map[string]bool, idx TagIndex
 		}
 		if accessor, ok := idx[node.Type]; ok {
 			names[accessor.Provider] = true
-		}
-		if node.Provider != "" {
-			names[node.Provider] = true
 		}
 		if len(node.Children) > 0 {
 			collectNames(node.Children, names, idx)

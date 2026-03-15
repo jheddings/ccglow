@@ -3,7 +3,6 @@ package render
 import (
 	"testing"
 
-	"github.com/jheddings/ccglow/internal/provider"
 	"github.com/jheddings/ccglow/internal/segment"
 	"github.com/jheddings/ccglow/internal/style"
 	"github.com/jheddings/ccglow/internal/types"
@@ -30,15 +29,19 @@ func TestTree_AtomicNode(t *testing.T) {
 
 	seg := setupTestRegistries()
 	sess := &types.SessionData{CWD: "/home/user/project"}
-	providerData := map[string]any{
-		"pwd": &provider.PwdData{Name: "project", Path: "/home/user/", Smart: "~/"},
+
+	segmentValues := map[string]any{
+		"pwd.name": "project",
+	}
+	tagIdx := TagIndex{
+		"pwd.name": fieldAccessor{Provider: "pwd", FieldIndex: 0},
 	}
 
 	tree := []types.SegmentNode{
-		{Type: "pwd.name", Provider: "pwd"},
+		{Type: "pwd.name"},
 	}
 
-	result := Tree(tree, seg, sess, providerData, map[string]any{}, TagIndex{})
+	result := Tree(tree, seg, sess, map[string]any{}, segmentValues, tagIdx)
 	if result != "project" {
 		t.Errorf("expected project, got %q", result)
 	}
@@ -50,22 +53,27 @@ func TestTree_CompositeCollapse(t *testing.T) {
 
 	seg := setupTestRegistries()
 	sess := &types.SessionData{CWD: "/tmp"}
-	providerData := map[string]any{
-		"git": &provider.GitData{},
+
+	segmentValues := map[string]any{
+		"git.branch":     nil,
+		"git.insertions": nil,
+	}
+	tagIdx := TagIndex{
+		"git.branch":     fieldAccessor{Provider: "git", FieldIndex: 0},
+		"git.insertions": fieldAccessor{Provider: "git", FieldIndex: 1},
 	}
 
 	tree := []types.SegmentNode{
 		{
-			Type:  "group",
 			Style: &types.StyleAttrs{Prefix: " | "},
 			Children: []types.SegmentNode{
-				{Type: "git.branch", Provider: "git"},
-				{Type: "git.insertions", Provider: "git"},
+				{Type: "git.branch"},
+				{Type: "git.insertions"},
 			},
 		},
 	}
 
-	result := Tree(tree, seg, sess, providerData, map[string]any{}, TagIndex{})
+	result := Tree(tree, seg, sess, map[string]any{}, segmentValues, tagIdx)
 	if result != "" {
 		t.Errorf("expected empty (collapsed composite), got %q", result)
 	}
@@ -77,16 +85,20 @@ func TestTree_DisabledNode(t *testing.T) {
 
 	seg := setupTestRegistries()
 	sess := &types.SessionData{CWD: "/tmp"}
-	providerData := map[string]any{
-		"pwd": &provider.PwdData{Name: "tmp"},
+
+	segmentValues := map[string]any{
+		"pwd.name": "tmp",
+	}
+	tagIdx := TagIndex{
+		"pwd.name": fieldAccessor{Provider: "pwd", FieldIndex: 0},
 	}
 
 	disabled := false
 	tree := []types.SegmentNode{
-		{Type: "pwd.name", Provider: "pwd", Enabled: &disabled},
+		{Type: "pwd.name", Enabled: &disabled},
 	}
 
-	result := Tree(tree, seg, sess, providerData, map[string]any{}, TagIndex{})
+	result := Tree(tree, seg, sess, map[string]any{}, segmentValues, tagIdx)
 	if result != "" {
 		t.Errorf("expected empty for disabled node, got %q", result)
 	}

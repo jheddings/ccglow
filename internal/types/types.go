@@ -67,9 +67,8 @@ type SegmentNode struct {
 
 // SegmentContext is passed to Segment.Render with resolved data.
 type SegmentContext struct {
-	Session  *SessionData
-	Provider any
-	Props    map[string]any
+	Session *SessionData
+	Props   map[string]any
 }
 
 // Segment renders a single atomic value.
