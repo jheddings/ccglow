@@ -2,7 +2,7 @@
   "segments": [
     {
       "segment": "pwd.smart",
-      "style": { "color": "white", "bgcolor": "#DC0000", "prefix": " ", "suffix": " " }
+      "style": { "color": "white", "bgcolor": "#DC0000", "prefix": " " }
     },
     {
       "segment": "pwd.name",
