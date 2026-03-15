@@ -19,7 +19,12 @@ func Apply(value string, attrs *types.StyleAttrs) string {
 		return value
 	}
 
-	styled := value
+	if attrs.Prefix != "" {
+		value = attrs.Prefix + value
+	}
+	if attrs.Suffix != "" {
+		value = value + attrs.Suffix
+	}
 
 	if colorLevel > 0 {
 		var mods strings.Builder
@@ -32,16 +37,9 @@ func Apply(value string, attrs *types.StyleAttrs) string {
 
 		colorCode := resolveColor(attrs.Color)
 		if colorCode != "" || mods.Len() > 0 {
-			styled = ansiReset + mods.String() + colorCode + value + ansiReset
+			return ansiReset + mods.String() + colorCode + value + ansiReset
 		}
 	}
 
-	if attrs.Prefix != "" {
-		styled = attrs.Prefix + styled
-	}
-	if attrs.Suffix != "" {
-		styled = styled + attrs.Suffix
-	}
-
-	return styled
+	return value
 }

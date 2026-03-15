@@ -68,10 +68,10 @@ func TestApply_PlainMode(t *testing.T) {
 	}
 }
 
-func TestApply_PrefixOutsideColor(t *testing.T) {
+func TestApply_PrefixInsideColor(t *testing.T) {
 	SetColorLevel(1)
 	result := Apply("val", &types.StyleAttrs{Color: "red", Prefix: ">> "})
-	expected := ">> \x1b[0m\x1b[31mval\x1b[0m"
+	expected := "\x1b[0m\x1b[31m>> val\x1b[0m"
 	if result != expected {
 		t.Errorf("expected %q, got %q", expected, result)
 	}
