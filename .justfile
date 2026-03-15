@@ -18,22 +18,14 @@ build:
 test:
 	go test ./...
 
-# run tests verbosely
-test-verbose:
-	go test -v ./...
-
 # auto-format
-tidy:
+tidy: setup
 	gofmt -w .
 
 # run format and vet checks
 check:
 	gofmt -l . | grep . && exit 1 || true
 	go vet ./...
-
-# typecheck (Go does this at build time, but useful as a standalone check)
-typecheck:
-	go build ./...
 
 # full preflight: build + check + test
 preflight: build check test
