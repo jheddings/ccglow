@@ -59,8 +59,12 @@ pointers for missing data so segments fail silent.
 
 **model** — Add `ID *string` to `ModelData`. Populate from `session.Model.ID`.
 
-**context** — Add `Remaining *string` to `ContextData`. Format as `"96%"`
-matching the existing `Percent` field pattern.
+**context** — Add `Remaining *int` to `ContextData`. Populate from
+`session.ContextWindow.RemainingPercentage`. The segment formats it as
+`"96%"`, matching how `context.percent` formats `Percent *int`.
+
+No changes needed to `ModelInfo` — the `ID` field already exists in the
+type definition.
 
 ## Segments
 
@@ -71,8 +75,15 @@ Register all four in `RegisterBuiltin()` in `segment.go`.
 
 ## Presets
 
-Add `claude.version` and `claude.style` to the `full` preset. Leave
-`default` and `minimal` unchanged.
+Add all four segments to the `full` preset:
+
+- `model.id` alongside the existing `model.name` group
+- `context.remaining` near `context.percent`
+- `claude.version` and `claude.style` as a new group
+
+Leave `default` and `minimal` unchanged.
+
+Register the `claude` provider in `RegisterBuiltin()` in `provider.go`.
 
 ## Testing
 
