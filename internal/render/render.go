@@ -4,9 +4,9 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/jheddings/ccnow/internal/segment"
-	"github.com/jheddings/ccnow/internal/style"
-	"github.com/jheddings/ccnow/internal/types"
+	"github.com/jheddings/ccglow/internal/segment"
+	"github.com/jheddings/ccglow/internal/style"
+	"github.com/jheddings/ccglow/internal/types"
 )
 
 func isEnabled(node *types.SegmentNode, session *types.SessionData) bool {

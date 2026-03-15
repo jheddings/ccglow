@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"strings"
 
-	"github.com/jheddings/ccnow/internal/types"
+	"github.com/jheddings/ccglow/internal/types"
 )
 
 // Parse parses session JSON from stdin. Returns nil on invalid input.

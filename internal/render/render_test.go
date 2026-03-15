@@ -3,10 +3,10 @@ package render
 import (
 	"testing"
 
-	"github.com/jheddings/ccnow/internal/provider"
-	"github.com/jheddings/ccnow/internal/segment"
-	"github.com/jheddings/ccnow/internal/style"
-	"github.com/jheddings/ccnow/internal/types"
+	"github.com/jheddings/ccglow/internal/provider"
+	"github.com/jheddings/ccglow/internal/segment"
+	"github.com/jheddings/ccglow/internal/style"
+	"github.com/jheddings/ccglow/internal/types"
 )
 
 func setupTestRegistries() *segment.Registry {

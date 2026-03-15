@@ -1,6 +1,6 @@
 package provider
 
-import "github.com/jheddings/ccnow/internal/types"
+import "github.com/jheddings/ccglow/internal/types"
 
 // RegisterBuiltin adds all built-in data providers to the registry.
 func RegisterBuiltin(registry *Registry) {

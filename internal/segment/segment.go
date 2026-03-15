@@ -3,8 +3,8 @@ package segment
 import (
 	"fmt"
 
-	"github.com/jheddings/ccnow/internal/provider"
-	"github.com/jheddings/ccnow/internal/types"
+	"github.com/jheddings/ccglow/internal/provider"
+	"github.com/jheddings/ccglow/internal/types"
 )
 
 // RegisterBuiltin adds all built-in segment implementations to the registry.

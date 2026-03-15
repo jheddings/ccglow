@@ -1,4 +1,4 @@
-# ccnow - AI Development Context
+# ccglow - AI Development Context
 
 Composable, spaceship-style statusline for Claude Code. Written in Go.
 

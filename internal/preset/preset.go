@@ -1,6 +1,6 @@
 package preset
 
-import "github.com/jheddings/ccnow/internal/types"
+import "github.com/jheddings/ccglow/internal/types"
 
 // Get returns the segment tree for a named preset, or nil.
 func Get(name string) []types.SegmentNode {

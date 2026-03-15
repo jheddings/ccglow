@@ -3,7 +3,7 @@ package provider
 import (
 	"fmt"
 
-	"github.com/jheddings/ccnow/internal/types"
+	"github.com/jheddings/ccglow/internal/types"
 )
 
 // SessionData holds resolved session timing and line-change data.

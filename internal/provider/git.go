@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jheddings/ccnow/internal/types"
+	"github.com/jheddings/ccglow/internal/types"
 )
 
 const gitTimeout = 5 * time.Second

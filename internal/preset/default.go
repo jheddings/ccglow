@@ -1,6 +1,6 @@
 package preset
 
-import "github.com/jheddings/ccnow/internal/types"
+import "github.com/jheddings/ccglow/internal/types"
 
 func defaultPreset() []types.SegmentNode {
 	return []types.SegmentNode{

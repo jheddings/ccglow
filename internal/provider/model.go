@@ -1,6 +1,6 @@
 package provider
 
-import "github.com/jheddings/ccnow/internal/types"
+import "github.com/jheddings/ccglow/internal/types"
 
 // ModelData holds resolved model information.
 type ModelData struct {

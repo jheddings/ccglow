@@ -3,7 +3,7 @@ package style
 import (
 	"strings"
 
-	"github.com/jheddings/ccnow/internal/types"
+	"github.com/jheddings/ccglow/internal/types"
 )
 
 var colorLevel = 1

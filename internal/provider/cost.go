@@ -3,7 +3,7 @@ package provider
 import (
 	"fmt"
 
-	"github.com/jheddings/ccnow/internal/types"
+	"github.com/jheddings/ccglow/internal/types"
 )
 
 // CostData holds resolved session cost information.

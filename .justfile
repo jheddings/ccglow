@@ -1,7 +1,7 @@
-# justfile for ccnow
+# justfile for ccglow
 
-module := "github.com/jheddings/ccnow"
-binary := "ccnow"
+module := "github.com/jheddings/ccglow"
+binary := "ccglow"
 
 # run setup on first invocation
 default: setup
@@ -50,7 +50,7 @@ release bump="patch": preflight
 		*) echo "Unknown bump type: {{bump}}"; exit 1 ;;
 	esac
 	VERSION="$MAJOR.$MINOR.$PATCH"
-	git commit --allow-empty -m "ccnow-$VERSION"
+	git commit --allow-empty -m "ccglow-$VERSION"
 	git tag -a "v$VERSION" -m "v$VERSION"
 	git push && git push --tags
 

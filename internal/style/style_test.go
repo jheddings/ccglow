@@ -3,7 +3,7 @@ package style
 import (
 	"testing"
 
-	"github.com/jheddings/ccnow/internal/types"
+	"github.com/jheddings/ccglow/internal/types"
 )
 
 func TestApply_Nil(t *testing.T) {

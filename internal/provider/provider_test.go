@@ -3,7 +3,7 @@ package provider
 import (
 	"testing"
 
-	"github.com/jheddings/ccnow/internal/types"
+	"github.com/jheddings/ccglow/internal/types"
 )
 
 func TestFormatTokens(t *testing.T) {

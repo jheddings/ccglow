@@ -1,4 +1,4 @@
-module github.com/jheddings/ccnow
+module github.com/jheddings/ccglow
 
 go 1.26.1
 
