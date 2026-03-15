@@ -3,7 +3,8 @@
     {
       "segment": "pwd.smart",
       "style": {
-        "color": "31"
+        "color": "31",
+        "prefix": "\uf07b "
       }
     },
     {
@@ -25,30 +26,43 @@
           "style": {
             "color": "whiteBright",
             "bold": true,
-            "prefix": " "
+            "prefix": "\ue0a0 "
           }
         },
         {
-          "segment": "git.insertions",
+          "segment": "group",
           "style": {
-            "color": "green",
-            "prefix": " · +"
-          }
-        },
-        {
-          "segment": "git.deletions",
-          "style": {
-            "color": "red",
-            "prefix": " -"
-          }
+            "prefix": " · "
+          },
+          "children": [
+            {
+              "segment": "git.insertions",
+              "style": {
+                "color": "green",
+                "prefix": "+"
+              }
+            },
+            {
+              "segment": "git.deletions",
+              "style": {
+                "color": "red",
+                "prefix": " -"
+              }
+            }
+          ]
         }
       ]
     },
     {
-      "segment": "model.name",
+      "segment": "group",
       "style": {
         "prefix": " | "
-      }
+      },
+      "children": [
+        {
+          "segment": "model.name"
+        }
+      ]
     },
     {
       "segment": "group",
@@ -60,7 +74,8 @@
           "segment": "context.tokens",
           "style": {
             "color": "white",
-            "bold": true
+            "bold": true,
+            "prefix": "\uf0e4 "
           }
         },
         {
@@ -81,19 +96,34 @@
       ]
     },
     {
-      "segment": "cost.usd",
+      "segment": "group",
       "style": {
-        "color": "yellow",
-        "bold": true,
         "prefix": " · "
-      }
+      },
+      "children": [
+        {
+          "segment": "cost.usd",
+          "style": {
+            "color": "yellow",
+            "bold": true
+          }
+        }
+      ]
     },
     {
-      "segment": "session.duration",
+      "segment": "group",
       "style": {
-        "color": "magenta",
         "prefix": " · "
-      }
+      },
+      "children": [
+        {
+          "segment": "session.duration",
+          "style": {
+            "color": "magenta",
+            "prefix": "\uf017 "
+          }
+        }
+      ]
     },
     {
       "segment": "group",
