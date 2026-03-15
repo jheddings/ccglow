@@ -1,31 +1,32 @@
 # ccglow
 
+**Your Claude Code statusline, built to impress.**
+
+Single binary. Zero dependencies. Pure ANSI. Infinite composability.
+
 ![ccglow full preset](docs/images/ccglow-full.png)
 
-A composable, [spaceship](https://spaceship-prompt.sh)-inspired statusline for [Claude Code](https://claude.ai/code).
+That's the full preset. Want something with more personality? Meet the F1 preset — powerline segments, truecolor, multi-line layout:
 
-Single binary. Zero runtime dependencies. Raw ANSI. Segment tree architecture.
+![ccglow f1 preset](docs/images/ccglow-f1.png)
 
-## Quick Start
+Every piece of data you see — path, branch, diffs, tokens, cost, duration — is
+an independent segment you can rearrange, restyle, or remove. Build exactly the
+statusline you want.
+
+## 🚀 Quick Start
 
 Install with `go install`:
 
 ```sh
-# use '@latest' or pick a tagged version
 go install github.com/jheddings/ccglow@latest
 ```
 
-Or run directly without installing:
-
-```sh
-go run github.com/jheddings/ccglow@latest
-```
-
-Then ask Claude Code:
+Then tell Claude Code to use it:
 
 > Set my statusline to use ccglow from https://github.com/jheddings/ccglow
 
-Or add to your `~/.claude/settings.json` manually:
+Or add it to `~/.claude/settings.json` directly:
 
 ```json
 {
@@ -37,40 +38,50 @@ Or add to your `~/.claude/settings.json` manually:
 }
 ```
 
-## Presets
+That's it. One binary, no runtime dependencies, no config files required.
 
-**default** — smart path, git branch + diffs, context usage, session duration
+## 🎨 Presets
+
+Five built-in layouts, from minimal to maximal.
+
+**default** — the essentials: path, branch, diffs, context, duration
 
 ```
 ~/Projects/ccglow |  main · +5 -3 | 360K (36%) · 2h 15m
 ```
 
-**minimal** — folder name, branch, token usage
+**minimal** — just the facts
 
 ```
 ccglow | main | 360K/1M
 ```
 
-**full** — everything: path, git, model, context, cost, duration, session lines
+**full** — everything, all at once
 
 ```
 ~/Projects/ccglow |  main · +5 -3 | Opus 4.6 · 360K/1M (36%) · $12.50 · 2h 15m · +1200 -85
 ```
 
-Select a preset:
+**f1** — multi-line, powerline-styled, truecolor. Requires a [Nerd Font](https://www.nerdfonts.com/).
+
+**moonwalk** — dark forest theme with powerline separators. Also requires a Nerd Font.
+
+Switch presets with `--preset`:
 
 ```sh
 ccglow --preset=minimal
-ccglow --preset=full
+ccglow --preset=f1
 ```
 
-## JSON Config
+## 🔧 Customization
 
-Use `--config` for full customization:
+Presets are just starting points. Use `--config` to load your own layout:
 
 ```sh
 ccglow --config ~/.claude/ccglow.json
 ```
+
+A config is a JSON file with a `segments` array. Each segment has a type, optional style, and optional children:
 
 ```json
 {
@@ -105,51 +116,22 @@ ccglow --config ~/.claude/ccglow.json
 }
 ```
 
-## Segments
+Groups auto-collapse when all their children are empty — no dangling
+separators, no ghost brackets. If there's no git repo, the git group just
+disappears.
 
-| Segment                 | Provider | Description                       |
-| ----------------------- | -------- | --------------------------------- |
-| `pwd.name`              | pwd      | Directory basename                |
-| `pwd.path`              | pwd      | Full path prefix                  |
-| `pwd.smart`             | pwd      | Smart-truncated path prefix       |
-| `git.branch`            | git      | Current branch name               |
-| `git.insertions`        | git      | Lines added (staged + unstaged)   |
-| `git.deletions`         | git      | Lines removed (staged + unstaged) |
-| `context.tokens`        | context  | Token count (24K, 1.2M)           |
-| `context.size`          | context  | Context window capacity           |
-| `context.percent`       | context  | Usage percentage                  |
-| `model.name`            | model    | Model display name                |
-| `cost.usd`              | cost     | Session cost in USD               |
-| `session.duration`      | session  | Session wall-clock time           |
-| `session.lines-added`   | session  | Lines added this session          |
-| `session.lines-removed` | session  | Lines removed this session        |
-| `literal`               | —        | Static text                       |
+For the full reference:
 
-### Colors
+- 📖 **[Segment Reference](docs/SEGMENTS.md)** — all available segments, what they render, special properties
+- 🎨 **[Style Reference](docs/STYLE.md)** — colors, attributes, formatting options
 
-Colors support three formats:
-
-- **Named**: `cyan`, `whiteBright`, `red`, `green`, etc. (16 ANSI colors)
-- **256-color**: `"39"`, `"240"` (numeric string)
-- **Truecolor**: `"#00afff"` (hex)
-
-### Style Attributes
-
-| Attribute | Type    | Description                     |
-| --------- | ------- | ------------------------------- |
-| `color`   | string  | Text color (named, 256, or hex) |
-| `bold`    | boolean | Bold text                       |
-| `italic`  | boolean | Italic text                     |
-| `prefix`  | string  | Text before the value           |
-| `suffix`  | string  | Text after the value            |
-
-## CLI Options
+## ⌨️ CLI Options
 
 ```
 Usage: ccglow [flags]
 
 Flags:
-  --preset <name>     Use a named preset (default, minimal, full)
+  --preset <name>     Use a named preset (default, minimal, full, f1, moonwalk)
   --config <path>     Load JSON config file
   --format <type>     Output format: ansi (default), plain
   --tee <path>        Write raw stdin JSON to file before processing
@@ -157,11 +139,17 @@ Flags:
   --version           Show version
 ```
 
-## Building from Source
+## 📦 Building from Source
 
 ```sh
 go build -o ccglow .
 ```
+
+## Links
+
+- [**Releases**](https://github.com/jheddings/ccglow/releases) — download pre-built binaries
+- [**Report a Bug**](https://github.com/jheddings/ccglow/issues/new?labels=bug) — something broken? let us know
+- [**Request a Feature**](https://github.com/jheddings/ccglow/issues/new?labels=enhancement) — got an idea? we're listening
 
 ## License
 
