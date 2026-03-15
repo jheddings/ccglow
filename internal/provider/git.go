@@ -54,8 +54,47 @@ func (p *gitProvider) Resolve(session *types.SessionData) (any, error) {
 		}
 	}
 
+	if mod, stg, unt, err := parseGitStatus(cwd); err == nil {
+		data.Modified = intPtr(mod)
+		data.Staged = intPtr(stg)
+		data.Untracked = intPtr(unt)
+	}
+
 	return data, nil
 }
+
+func parseGitStatus(cwd string) (modified, staged, untracked int, err error) {
+	// Use gitExecRaw to preserve leading whitespace in porcelain output,
+	// since the first column position is significant.
+	out, err := gitExecRaw(cwd, "status", "--porcelain")
+	if err != nil {
+		return 0, 0, 0, err
+	}
+	if out == "" {
+		return 0, 0, 0, nil
+	}
+	for _, line := range strings.Split(out, "\n") {
+		if len(line) < 2 {
+			continue
+		}
+		if strings.HasPrefix(line, "??") {
+			untracked++
+			continue
+		}
+		x, y := line[0], line[1]
+		// Column 1: staged changes
+		if x == 'M' || x == 'A' || x == 'D' || x == 'R' || x == 'C' {
+			staged++
+		}
+		// Column 2: unstaged changes
+		if y == 'M' || y == 'D' || y == 'T' {
+			modified++
+		}
+	}
+	return modified, staged, untracked, nil
+}
+
+func intPtr(n int) *int { return &n }
 
 var (
 	insertionRe = regexp.MustCompile(`(\d+) insertion`)
@@ -77,4 +116,18 @@ func gitExec(cwd string, args ...string) (string, error) {
 		return "", err
 	}
 	return strings.TrimSpace(string(out)), nil
+}
+
+// gitExecRaw runs a git command and returns output with only trailing
+// whitespace trimmed, preserving leading whitespace which is significant
+// in commands like "status --porcelain".
+func gitExecRaw(cwd string, args ...string) (string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), gitTimeout)
+	defer cancel()
+	cmd := exec.CommandContext(ctx, "git", append([]string{"-C", cwd}, args...)...)
+	out, err := cmd.Output()
+	if err != nil {
+		return "", err
+	}
+	return strings.TrimRight(string(out), " \t\n\r"), nil
 }
