@@ -149,6 +149,94 @@ func TestGitWorktreeDetection(t *testing.T) {
 	}
 }
 
+func TestGitRemoteOwnerRepo(t *testing.T) {
+	skipWithoutGit(t)
+	dir := initTempRepo(t)
+
+	// Add an HTTPS remote
+	cmd := exec.Command("git", "remote", "add", "origin", "https://github.com/myowner/myrepo.git")
+	cmd.Dir = dir
+	if out, err := cmd.CombinedOutput(); err != nil {
+		t.Fatalf("remote add failed: %s", out)
+	}
+
+	p := &gitProvider{}
+	sess := &types.SessionData{CWD: dir}
+	result, err := p.Resolve(sess)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	data := result.(*GitData)
+	if data.Owner == nil {
+		t.Fatal("expected non-nil Owner")
+	}
+	if *data.Owner != "myowner" {
+		t.Errorf("expected owner 'myowner', got %q", *data.Owner)
+	}
+	if data.Repo == nil {
+		t.Fatal("expected non-nil Repo")
+	}
+	if *data.Repo != "myrepo" {
+		t.Errorf("expected repo 'myrepo', got %q", *data.Repo)
+	}
+}
+
+func TestGitRemoteSSH(t *testing.T) {
+	skipWithoutGit(t)
+	dir := initTempRepo(t)
+
+	// Add an SSH remote
+	cmd := exec.Command("git", "remote", "add", "origin", "git@github.com:sshowner/sshrepo.git")
+	cmd.Dir = dir
+	if out, err := cmd.CombinedOutput(); err != nil {
+		t.Fatalf("remote add failed: %s", out)
+	}
+
+	p := &gitProvider{}
+	sess := &types.SessionData{CWD: dir}
+	result, err := p.Resolve(sess)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	data := result.(*GitData)
+	if data.Owner == nil {
+		t.Fatal("expected non-nil Owner")
+	}
+	if *data.Owner != "sshowner" {
+		t.Errorf("expected owner 'sshowner', got %q", *data.Owner)
+	}
+	if data.Repo == nil {
+		t.Fatal("expected non-nil Repo")
+	}
+	if *data.Repo != "sshrepo" {
+		t.Errorf("expected repo 'sshrepo', got %q", *data.Repo)
+	}
+}
+
+func TestGitRemoteNoOrigin(t *testing.T) {
+	skipWithoutGit(t)
+	dir := initTempRepo(t)
+
+	// No remote added
+
+	p := &gitProvider{}
+	sess := &types.SessionData{CWD: dir}
+	result, err := p.Resolve(sess)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	data := result.(*GitData)
+	if data.Owner != nil {
+		t.Errorf("expected nil Owner, got %q", *data.Owner)
+	}
+	if data.Repo != nil {
+		t.Errorf("expected nil Repo, got %q", *data.Repo)
+	}
+}
+
 func TestGitWorktreeMainCopy(t *testing.T) {
 	skipWithoutGit(t)
 	dir := initTempRepo(t)

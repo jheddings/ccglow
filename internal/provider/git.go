@@ -23,6 +23,8 @@ type GitData struct {
 	Staged     *int
 	Untracked  *int
 	Worktree   *string
+	Owner      *string
+	Repo       *string
 }
 
 type gitProvider struct{}
@@ -62,6 +64,11 @@ func (p *gitProvider) Resolve(session *types.SessionData) (any, error) {
 	}
 
 	data.Worktree = detectWorktree(cwd)
+
+	if owner, repo, err := parseRemoteOwnerRepo(cwd); err == nil {
+		data.Owner = &owner
+		data.Repo = &repo
+	}
 
 	return data, nil
 }
@@ -131,6 +138,44 @@ func detectWorktree(cwd string) *string {
 	}
 	name := filepath.Base(toplevel)
 	return &name
+}
+
+// parseRemoteOwnerRepo extracts the owner and repository name from the
+// origin remote URL.  It handles both SSH (git@host:owner/repo.git) and
+// HTTPS (https://host/owner/repo.git) formats.
+func parseRemoteOwnerRepo(cwd string) (owner, repo string, err error) {
+	url, err := gitExec(cwd, "remote", "get-url", "origin")
+	if err != nil {
+		return "", "", err
+	}
+
+	// Normalize SSH URLs: git@host:owner/repo -> host/owner/repo
+	if strings.Contains(url, ":") && !strings.Contains(url, "://") {
+		// SSH format — replace first ":" after the host with "/"
+		url = url[strings.Index(url, ":")+1:]
+	} else {
+		// HTTPS format — strip scheme and host
+		// e.g. https://github.com/owner/repo.git -> /owner/repo.git
+		if idx := strings.Index(url, "://"); idx != -1 {
+			url = url[idx+3:]
+			// Remove host portion
+			if slash := strings.Index(url, "/"); slash != -1 {
+				url = url[slash+1:]
+			}
+		}
+	}
+
+	// Strip .git suffix
+	url = strings.TrimSuffix(url, ".git")
+
+	parts := strings.Split(url, "/")
+	if len(parts) < 2 {
+		return "", "", fmt.Errorf("cannot parse owner/repo from remote URL")
+	}
+
+	owner = parts[len(parts)-2]
+	repo = parts[len(parts)-1]
+	return owner, repo, nil
 }
 
 var (
