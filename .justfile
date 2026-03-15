@@ -12,7 +12,7 @@ setup:
 
 # build the binary
 build:
-	go build -o {{binary}} .
+	go build -o dist/{{binary}} .
 
 # run tests
 test:
