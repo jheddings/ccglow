@@ -179,6 +179,42 @@ func TestModelProvider(t *testing.T) {
 	}
 }
 
+func TestModelProviderID(t *testing.T) {
+	p := &modelProvider{}
+	sess := &types.SessionData{
+		CWD:   "/tmp",
+		Model: &types.ModelInfo{ID: "claude-opus-4-6[1m]", DisplayName: "Opus 4.6"},
+	}
+
+	result, err := p.Resolve(sess)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	data := result.(*ModelData)
+	if data.ID == nil || *data.ID != "claude-opus-4-6[1m]" {
+		t.Errorf("expected claude-opus-4-6[1m], got %v", data.ID)
+	}
+}
+
+func TestModelProviderNoModel(t *testing.T) {
+	p := &modelProvider{}
+	sess := &types.SessionData{CWD: "/tmp"}
+
+	result, err := p.Resolve(sess)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	data := result.(*ModelData)
+	if data.ID != nil {
+		t.Errorf("expected nil ID, got %v", data.ID)
+	}
+	if data.Name != nil {
+		t.Errorf("expected nil Name, got %v", data.Name)
+	}
+}
+
 func TestSessionProvider(t *testing.T) {
 	p := &sessionProvider{}
 	sess := &types.SessionData{
