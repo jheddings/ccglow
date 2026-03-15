@@ -1,20 +1,29 @@
-# ccnow
+# ccglow
+
+![ccglow full preset](docs/images/ccglow-full.png)
 
 A composable, [spaceship](https://spaceship-prompt.sh)-inspired statusline for [Claude Code](https://claude.ai/code).
 
-Zero dependencies. Raw ANSI. Segment tree architecture.
+Single binary. Zero runtime dependencies. Raw ANSI. Segment tree architecture.
 
 ## Quick Start
 
-Install globally:
+Install with `go install`:
 
 ```sh
-npm install -g ccnow
+# use '@latest' or pick a tagged version
+go install github.com/jheddings/ccglow@latest
+```
+
+Or run directly without installing:
+
+```sh
+go run github.com/jheddings/ccglow@latest
 ```
 
 Then ask Claude Code:
 
-> Set my statusline to use ccnow from https://github.com/jheddings/ccnow
+> Set my statusline to use ccglow from https://github.com/jheddings/ccglow
 
 Or add to your `~/.claude/settings.json` manually:
 
@@ -22,42 +31,37 @@ Or add to your `~/.claude/settings.json` manually:
 {
   "statusLine": {
     "type": "command",
-    "command": "ccnow",
+    "command": "ccglow",
     "padding": 0
   }
 }
 ```
-
-> **Note:** `npx -y ccnow` also works, but has a
-> [known issue](https://github.com/npm/cli/issues/3781) where `npx` can
-> consume stdin when installing the package for the first time, resulting in
-> an empty statusline. Installing globally avoids this.
 
 ## Presets
 
 **default** — smart path, git branch + diffs, context usage, session duration
 
 ```
-~/Projects/ccnow |  main · +5 -3 | 360K (36%) · 2h 15m
+~/Projects/ccglow |  main · +5 -3 | 360K (36%) · 2h 15m
 ```
 
 **minimal** — folder name, branch, token usage
 
 ```
-ccnow | main | 360K/1M
+ccglow | main | 360K/1M
 ```
 
 **full** — everything: path, git, model, context, cost, duration, session lines
 
 ```
-~/Projects/ccnow |  main · +5 -3 | Opus 4.6 · 360K/1M (36%) · $12.50 · 2h 15m · +1200 -85
+~/Projects/ccglow |  main · +5 -3 | Opus 4.6 · 360K/1M (36%) · $12.50 · 2h 15m · +1200 -85
 ```
 
 Select a preset:
 
 ```sh
-npx -y ccnow --preset=minimal
-npx -y ccnow --preset=full
+ccglow --preset=minimal
+ccglow --preset=full
 ```
 
 ## JSON Config
@@ -65,7 +69,7 @@ npx -y ccnow --preset=full
 Use `--config` for full customization:
 
 ```sh
-npx -y ccnow --config ~/.claude/ccnow.json
+ccglow --config ~/.claude/ccglow.json
 ```
 
 ```json
@@ -142,15 +146,21 @@ Colors support three formats:
 ## CLI Options
 
 ```
-Usage: ccnow [options]
+Usage: ccglow [flags]
 
-Options:
+Flags:
   --preset <name>     Use a named preset (default, minimal, full)
   --config <path>     Load JSON config file
   --format <type>     Output format: ansi (default), plain
   --tee <path>        Write raw stdin JSON to file before processing
   --help              Show help
   --version           Show version
+```
+
+## Building from Source
+
+```sh
+go build -o ccglow .
 ```
 
 ## License

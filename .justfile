@@ -1,34 +1,31 @@
-# justfile for ccnow
+# justfile for ccglow
+
+module := "github.com/jheddings/ccglow"
+binary := "ccglow"
 
 # run setup on first invocation
 default: setup
 
 # setup the local development environment
 setup:
-	npm install
+	go mod tidy
 
-# build TypeScript
+# build the binary
 build:
-	npm run build
+	go build -o dist/{{binary}} .
 
 # run tests
 test:
-	npm test
+	go test ./...
 
-# run tests in watch mode
-test-watch:
-	npm test -- --watch
+# auto-format
+tidy: setup
+	gofmt -w .
 
-# auto-format and lint-fix
-tidy:
-	npx prettier --write .
-	npx eslint . --fix
-
-# run format, lint, and type checks (no fix)
+# run format and vet checks
 check:
-	npx prettier --check .
-	npx eslint .
-	npx tsc --noEmit
+	gofmt -l . | grep . && exit 1 || true
+	go vet ./...
 
 # full preflight: build + check + test
 preflight: build check test
@@ -40,18 +37,27 @@ notes tag="--unreleased":
 # bump version, preflight, commit, tag, and push
 release bump="patch": preflight
 	#!/usr/bin/env bash
-	npm version {{bump}} --no-git-tag-version
-	VERSION=$(node -p "require('./package.json').version")
-	npx prettier --write package.json package-lock.json
-	git add package.json package-lock.json
-	git commit -m "ccnow-$VERSION"
+	# read current version from git tags
+	CURRENT=$(git describe --tags --abbrev=0 2>/dev/null | sed 's/^v//')
+	if [ -z "$CURRENT" ]; then
+		CURRENT="0.0.0"
+	fi
+	IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT"
+	case "{{bump}}" in
+		major) MAJOR=$((MAJOR + 1)); MINOR=0; PATCH=0 ;;
+		minor) MINOR=$((MINOR + 1)); PATCH=0 ;;
+		patch) PATCH=$((PATCH + 1)) ;;
+		*) echo "Unknown bump type: {{bump}}"; exit 1 ;;
+	esac
+	VERSION="$MAJOR.$MINOR.$PATCH"
+	git commit --allow-empty -m "ccglow-$VERSION"
 	git tag -a "v$VERSION" -m "v$VERSION"
 	git push && git push --tags
 
 # remove build artifacts
 clean:
-	rm -rf dist
+	rm -f {{binary}}
 
-# remove everything including node_modules
+# remove everything including caches
 clobber: clean
-	rm -rf node_modules
+	go clean -cache

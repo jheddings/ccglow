@@ -68,7 +68,7 @@ body:
       options:
         - 'Nice to have - would be convenient'
         - 'Important - would improve my workflow significantly'
-        - 'Critical - I really need this to use ccnow effectively'
+        - 'Critical - I really need this to use ccglow effectively'
         - 'Unsure'
     validations:
       required: true

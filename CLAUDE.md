@@ -1,49 +1,45 @@
-# ccnow - AI Development Context
+# ccglow - AI Development Context
 
-Composable, spaceship-style statusline for Claude Code. TypeScript + Node.js + chalk.
+Composable, spaceship-style statusline for Claude Code. Written in Go.
 
 ## Architecture
 
 Segment tree model: atomic segments (single data point) and composite segments
-(groups with `enabled` gating). DataProviders lazily fetch and cache external data.
-A runner orchestrates the pipeline: parse CLI → load render tree → read stdin →
+(groups with `enabled` gating). Providers lazily fetch and cache external data.
+The main pipeline: parse CLI → load render tree → read stdin →
 resolve providers → depth-first render → styled output.
 
 **Key concepts**:
 
 - `SegmentNode` — configuration (what to render, how it looks)
 - `Segment` — runtime behavior (how to produce a value)
-- `DataProvider` — lazy, cached data fetcher (git, pwd, context)
-- DSL — internal authoring format for presets (factory functions with trailing closures)
+- `Provider` — lazy, cached data fetcher (git, pwd, context)
+- Presets — Go functions that return `[]SegmentNode` trees
 
 ## Project Structure
 
-- `src/types.ts` — all shared interfaces
-- `src/cli.ts` — entry point, stdin/stdout
-- `src/runner.ts` — pipeline orchestrator
-- `src/render.ts` — tree traversal, styling
-- `src/segments/` — one file per segment
-- `src/providers/` — one file per data provider
-- `src/dsl/` — DSL factory functions
-- `src/presets/` — named layouts (default, minimal, full)
+- `main.go` — entry point, CLI (cobra), pipeline orchestration
+- `internal/types/` — shared types (`SegmentNode`, `Style`)
+- `internal/session/` — stdin JSON parsing
+- `internal/config/` — JSON config file parsing
+- `internal/segment/` — segment registry and implementations
+- `internal/provider/` — provider registry and implementations
+- `internal/render/` — tree traversal, provider resolution, output
+- `internal/style/` — ANSI styling, color level control
+- `internal/preset/` — named layouts (default, minimal, full)
 
 ## Development
 
 **Key commands**:
 
-- `just setup` — install dependencies
-- `just build` — compile TypeScript
-- `just test` — run all tests
-- `just typecheck` — type check without emitting
-- `just preflight` — build + typecheck + test (run before PR)
-- `just dev` — build and run with sample input
-- `just dev-live` — build and run with tee'd session data
+- `go build ./...` — build
+- `go test ./...` — run all tests
+- `go vet ./...` — static analysis
 
-**Adding a segment**: Create `src/segments/<name>.ts` implementing `Segment`,
-register it in `src/segments/index.ts`.
+**Adding a segment**: Add a case in `internal/segment/segment.go`'s registry.
 
-**Adding a provider**: Create `src/providers/<name>.ts` implementing `DataProvider`,
-register it in `src/providers/index.ts`.
+**Adding a provider**: Create `internal/provider/<name>.go` implementing `Provider`,
+register it in `internal/provider/provider.go`.
 
 ## Commit Conventions
 
@@ -73,8 +69,8 @@ Examples: `feat/color-themes`, `fix/token-formatting`, `chore/update-deps`
 
 - Follow TDD — write failing tests first, then implement
 - Keep segments focused — one data point per atomic segment
-- Return `null` from segments when there's no data (fail silent)
-- Run `just preflight` before merging
+- Return `""` from segments when there's no data (fail silent)
+- Run `go vet ./... && go test ./...` before merging
 - Work on feature branches
 
 **Don't**:
@@ -82,5 +78,5 @@ Examples: `feat/color-themes`, `fix/token-formatting`, `chore/update-deps`
 - Push directly to main
 - Never force-push to main
 - Skip tests for new segments or providers
-- Put styling logic in segments — segments return raw values, the runner applies style
-- Mutate global chalk state — use `setColorLevel()` from `style.ts`
+- Put styling logic in segments — segments return raw values, the renderer applies style
+- Mutate global color state — use `style.SetColorLevel()` from `internal/style/`
