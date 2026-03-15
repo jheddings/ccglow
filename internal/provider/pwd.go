@@ -1,9 +1,11 @@
-package statusline
+package provider
 
 import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/jheddings/ccnow/internal/types"
 )
 
 // PwdData holds resolved working directory information.
@@ -17,7 +19,7 @@ type pwdProvider struct{}
 
 func (p *pwdProvider) Name() string { return "pwd" }
 
-func (p *pwdProvider) Resolve(session *SessionData) (any, error) {
+func (p *pwdProvider) Resolve(session *types.SessionData) (any, error) {
 	cwd := session.CWD
 	name := filepath.Base(cwd)
 	dir := filepath.Dir(cwd)

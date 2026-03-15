@@ -1,8 +1,10 @@
-package statusline
+package config
 
 import (
 	"encoding/json"
 	"strings"
+
+	"github.com/jheddings/ccnow/internal/types"
 )
 
 var noProviderSegments = map[string]bool{
@@ -15,16 +17,16 @@ type configFile struct {
 	Segments []json.RawMessage `json:"segments"`
 }
 
-// ParseConfig parses a JSON config file into a segment tree.
-func ParseConfig(data []byte) ([]SegmentNode, error) {
+// Parse parses a JSON config file into a segment tree.
+func Parse(data []byte) ([]types.SegmentNode, error) {
 	var cfg configFile
 	if err := json.Unmarshal(data, &cfg); err != nil {
 		return nil, err
 	}
 
-	var nodes []SegmentNode
+	var nodes []types.SegmentNode
 	for _, raw := range cfg.Segments {
-		var node SegmentNode
+		var node types.SegmentNode
 		if err := json.Unmarshal(raw, &node); err != nil {
 			continue
 		}
@@ -40,7 +42,7 @@ func ParseConfig(data []byte) ([]SegmentNode, error) {
 
 // InferProviders sets the Provider field on nodes that don't have one,
 // based on the segment type prefix (e.g. "git.branch" → provider "git").
-func InferProviders(nodes []SegmentNode) {
+func InferProviders(nodes []types.SegmentNode) {
 	for i := range nodes {
 		if nodes[i].Provider == "" && nodes[i].Type != "" && !noProviderSegments[nodes[i].Type] {
 			parts := strings.SplitN(nodes[i].Type, ".", 2)

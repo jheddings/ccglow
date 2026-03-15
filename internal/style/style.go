@@ -1,9 +1,11 @@
-package statusline
+package style
 
 import (
 	"fmt"
 	"strconv"
 	"strings"
+
+	"github.com/jheddings/ccnow/internal/types"
 )
 
 var colorLevel = 1
@@ -38,9 +40,9 @@ const (
 	ansiItalic = "\x1b[3m"
 )
 
-// ApplyStyle wraps a value with ANSI escape codes and prefix/suffix.
-func ApplyStyle(value string, style *StyleAttrs) string {
-	if style == nil {
+// Apply wraps a value with ANSI escape codes and prefix/suffix.
+func Apply(value string, attrs *types.StyleAttrs) string {
+	if attrs == nil {
 		return value
 	}
 
@@ -48,24 +50,24 @@ func ApplyStyle(value string, style *StyleAttrs) string {
 
 	if colorLevel > 0 {
 		var mods strings.Builder
-		if style.Bold {
+		if attrs.Bold {
 			mods.WriteString(ansiBold)
 		}
-		if style.Italic {
+		if attrs.Italic {
 			mods.WriteString(ansiItalic)
 		}
 
-		colorCode := resolveColor(style.Color)
+		colorCode := resolveColor(attrs.Color)
 		if colorCode != "" || mods.Len() > 0 {
 			styled = ansiReset + mods.String() + colorCode + value + ansiReset
 		}
 	}
 
-	if style.Prefix != "" {
-		styled = style.Prefix + styled
+	if attrs.Prefix != "" {
+		styled = attrs.Prefix + styled
 	}
-	if style.Suffix != "" {
-		styled = styled + style.Suffix
+	if attrs.Suffix != "" {
+		styled = styled + attrs.Suffix
 	}
 
 	return styled

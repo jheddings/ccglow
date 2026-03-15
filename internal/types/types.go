@@ -1,4 +1,4 @@
-package statusline
+package types
 
 // SessionData represents the JSON session data piped from Claude Code.
 type SessionData struct {

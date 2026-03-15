@@ -1,4 +1,4 @@
-package statusline
+package provider
 
 import (
 	"context"
@@ -7,6 +7,8 @@ import (
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/jheddings/ccnow/internal/types"
 )
 
 const gitTimeout = 5 * time.Second
@@ -22,7 +24,7 @@ type gitProvider struct{}
 
 func (p *gitProvider) Name() string { return "git" }
 
-func (p *gitProvider) Resolve(session *SessionData) (any, error) {
+func (p *gitProvider) Resolve(session *types.SessionData) (any, error) {
 	cwd := session.CWD
 
 	if !gitAvailable(cwd) {

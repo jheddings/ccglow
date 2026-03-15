@@ -5,14 +5,21 @@ import (
 	"io"
 	"os"
 
-	"github.com/jheddings/ccnow/internal/statusline"
+	"github.com/jheddings/ccnow/internal/config"
+	"github.com/jheddings/ccnow/internal/preset"
+	"github.com/jheddings/ccnow/internal/provider"
+	"github.com/jheddings/ccnow/internal/render"
+	"github.com/jheddings/ccnow/internal/segment"
+	"github.com/jheddings/ccnow/internal/session"
+	"github.com/jheddings/ccnow/internal/style"
+	"github.com/jheddings/ccnow/internal/types"
 	"github.com/spf13/cobra"
 )
 
 var version = "dev"
 
 func main() {
-	var preset, config, format, tee string
+	var presetName, configPath, format, tee string
 
 	root := &cobra.Command{
 		Use:     "ccnow",
@@ -31,12 +38,7 @@ func main() {
 				}
 			}
 
-			output := statusline.Run(statusline.Options{
-				Preset: preset,
-				Config: config,
-				Format: format,
-			}, string(stdinBytes))
-
+			output := run(presetName, configPath, format, string(stdinBytes))
 			if output != "" {
 				fmt.Print(output)
 			}
@@ -45,8 +47,8 @@ func main() {
 		},
 	}
 
-	root.Flags().StringVar(&preset, "preset", "default", "Use a named preset (default, minimal, full)")
-	root.Flags().StringVar(&config, "config", "", "Load JSON config file")
+	root.Flags().StringVar(&presetName, "preset", "default", "Use a named preset (default, minimal, full)")
+	root.Flags().StringVar(&configPath, "config", "", "Load JSON config file")
 	root.Flags().StringVar(&format, "format", "ansi", "Output format: ansi, plain")
 	root.Flags().StringVar(&tee, "tee", "", "Write raw stdin JSON to file before processing")
 
@@ -56,4 +58,53 @@ func main() {
 	if err := root.Execute(); err != nil {
 		os.Exit(1)
 	}
+}
+
+func run(presetName, configPath, format, stdin string) string {
+	sess := session.Parse(stdin)
+	if sess == nil {
+		return ""
+	}
+
+	if format == "plain" {
+		style.SetColorLevel(0)
+	} else {
+		style.SetColorLevel(1)
+	}
+	defer style.SetColorLevel(1)
+
+	segments := segment.NewRegistry()
+	segment.RegisterBuiltin(segments)
+
+	providers := provider.NewRegistry()
+	provider.RegisterBuiltin(providers)
+
+	tree := resolveTree(presetName, configPath)
+
+	providerNames := render.CollectProviderNames(tree)
+	providerData := render.ResolveProviders(providerNames, providers.All(), sess)
+
+	return render.Tree(tree, segments, sess, providerData)
+}
+
+func resolveTree(presetName, configPath string) []types.SegmentNode {
+	if configPath != "" {
+		data, err := os.ReadFile(configPath)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "ccnow: failed to load config: %v\n", err)
+		} else {
+			tree, err := config.Parse(data)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "ccnow: failed to parse config: %v\n", err)
+			} else if len(tree) > 0 {
+				return tree
+			}
+		}
+	}
+
+	if tree := preset.Get(presetName); tree != nil {
+		return tree
+	}
+
+	return preset.Get("default")
 }

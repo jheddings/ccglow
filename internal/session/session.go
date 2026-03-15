@@ -1,18 +1,20 @@
-package statusline
+package session
 
 import (
 	"encoding/json"
 	"strings"
+
+	"github.com/jheddings/ccnow/internal/types"
 )
 
-// ParseSession parses session JSON from stdin. Returns nil on invalid input.
-func ParseSession(input string) *SessionData {
+// Parse parses session JSON from stdin. Returns nil on invalid input.
+func Parse(input string) *types.SessionData {
 	input = strings.TrimSpace(input)
 	if input == "" {
 		return nil
 	}
 
-	var session SessionData
+	var session types.SessionData
 	if err := json.Unmarshal([]byte(input), &session); err != nil {
 		return nil
 	}

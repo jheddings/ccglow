@@ -1,9 +1,13 @@
-package statusline
+package provider
 
-import "fmt"
+import (
+	"fmt"
 
-// SessionProviderData holds resolved session timing and line-change data.
-type SessionProviderData struct {
+	"github.com/jheddings/ccnow/internal/types"
+)
+
+// SessionData holds resolved session timing and line-change data.
+type SessionData struct {
 	Duration     *string
 	LinesAdded   *int
 	LinesRemoved *int
@@ -13,8 +17,8 @@ type sessionProvider struct{}
 
 func (p *sessionProvider) Name() string { return "session" }
 
-func (p *sessionProvider) Resolve(session *SessionData) (any, error) {
-	data := &SessionProviderData{}
+func (p *sessionProvider) Resolve(session *types.SessionData) (any, error) {
+	data := &SessionData{}
 	if session.Cost == nil {
 		return data, nil
 	}

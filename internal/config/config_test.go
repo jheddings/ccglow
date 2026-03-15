@@ -1,8 +1,8 @@
-package statusline
+package config
 
 import "testing"
 
-func TestParseConfig_Valid(t *testing.T) {
+func TestParse_Valid(t *testing.T) {
 	input := `{
 		"segments": [
 			{"segment": "pwd.name", "style": {"color": "red"}},
@@ -10,7 +10,7 @@ func TestParseConfig_Valid(t *testing.T) {
 		]
 	}`
 
-	nodes, err := ParseConfig([]byte(input))
+	nodes, err := Parse([]byte(input))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -28,7 +28,7 @@ func TestParseConfig_Valid(t *testing.T) {
 	}
 }
 
-func TestParseConfig_WithChildren(t *testing.T) {
+func TestParse_WithChildren(t *testing.T) {
 	input := `{
 		"segments": [
 			{
@@ -41,7 +41,7 @@ func TestParseConfig_WithChildren(t *testing.T) {
 		]
 	}`
 
-	nodes, err := ParseConfig([]byte(input))
+	nodes, err := Parse([]byte(input))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -56,10 +56,10 @@ func TestParseConfig_WithChildren(t *testing.T) {
 	}
 }
 
-func TestParseConfig_LiteralNoProvider(t *testing.T) {
+func TestParse_LiteralNoProvider(t *testing.T) {
 	input := `{"segments": [{"segment": "literal", "props": {"text": "hi"}}]}`
 
-	nodes, err := ParseConfig([]byte(input))
+	nodes, err := Parse([]byte(input))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -68,8 +68,8 @@ func TestParseConfig_LiteralNoProvider(t *testing.T) {
 	}
 }
 
-func TestParseConfig_InvalidJSON(t *testing.T) {
-	_, err := ParseConfig([]byte("not json"))
+func TestParse_InvalidJSON(t *testing.T) {
+	_, err := Parse([]byte("not json"))
 	if err == nil {
 		t.Error("expected error for invalid JSON")
 	}

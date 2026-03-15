@@ -1,6 +1,10 @@
-package statusline
+package provider
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/jheddings/ccnow/internal/types"
+)
 
 // CostData holds resolved session cost information.
 type CostData struct {
@@ -11,7 +15,7 @@ type costProvider struct{}
 
 func (p *costProvider) Name() string { return "cost" }
 
-func (p *costProvider) Resolve(session *SessionData) (any, error) {
+func (p *costProvider) Resolve(session *types.SessionData) (any, error) {
 	data := &CostData{}
 	if session.Cost != nil {
 		usd := fmt.Sprintf("$%.2f", session.Cost.TotalCostUSD)

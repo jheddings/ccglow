@@ -1,4 +1,6 @@
-package statusline
+package provider
+
+import "github.com/jheddings/ccnow/internal/types"
 
 // ModelData holds resolved model information.
 type ModelData struct {
@@ -9,7 +11,7 @@ type modelProvider struct{}
 
 func (p *modelProvider) Name() string { return "model" }
 
-func (p *modelProvider) Resolve(session *SessionData) (any, error) {
+func (p *modelProvider) Resolve(session *types.SessionData) (any, error) {
 	data := &ModelData{}
 	if session.Model != nil && session.Model.DisplayName != "" {
 		data.Name = &session.Model.DisplayName

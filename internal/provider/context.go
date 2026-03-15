@@ -1,6 +1,10 @@
-package statusline
+package provider
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/jheddings/ccnow/internal/types"
+)
 
 // ContextData holds resolved context window information.
 type ContextData struct {
@@ -13,7 +17,7 @@ type contextProvider struct{}
 
 func (p *contextProvider) Name() string { return "context" }
 
-func (p *contextProvider) Resolve(session *SessionData) (any, error) {
+func (p *contextProvider) Resolve(session *types.SessionData) (any, error) {
 	cw := session.ContextWindow
 	if cw == nil {
 		return &ContextData{}, nil

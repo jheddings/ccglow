@@ -1,6 +1,10 @@
-package statusline
+package provider
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/jheddings/ccnow/internal/types"
+)
 
 func TestFormatTokens(t *testing.T) {
 	tests := []struct {
@@ -47,12 +51,12 @@ func TestFormatDuration(t *testing.T) {
 
 func TestContextProvider(t *testing.T) {
 	p := &contextProvider{}
-	session := &SessionData{
+	sess := &types.SessionData{
 		CWD: "/tmp",
-		ContextWindow: &ContextWindow{
+		ContextWindow: &types.ContextWindow{
 			UsedPercentage:    36,
 			ContextWindowSize: 1000000,
-			CurrentUsage: &CurrentUsage{
+			CurrentUsage: &types.CurrentUsage{
 				InputTokens:              100,
 				CacheCreationInputTokens: 200,
 				CacheReadInputTokens:     300,
@@ -60,7 +64,7 @@ func TestContextProvider(t *testing.T) {
 		},
 	}
 
-	result, err := p.Resolve(session)
+	result, err := p.Resolve(sess)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -79,12 +83,12 @@ func TestContextProvider(t *testing.T) {
 
 func TestCostProvider(t *testing.T) {
 	p := &costProvider{}
-	session := &SessionData{
+	sess := &types.SessionData{
 		CWD:  "/tmp",
-		Cost: &CostInfo{TotalCostUSD: 12.5},
+		Cost: &types.CostInfo{TotalCostUSD: 12.5},
 	}
 
-	result, err := p.Resolve(session)
+	result, err := p.Resolve(sess)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -97,12 +101,12 @@ func TestCostProvider(t *testing.T) {
 
 func TestModelProvider(t *testing.T) {
 	p := &modelProvider{}
-	session := &SessionData{
+	sess := &types.SessionData{
 		CWD:   "/tmp",
-		Model: &ModelInfo{DisplayName: "Opus 4.6"},
+		Model: &types.ModelInfo{DisplayName: "Opus 4.6"},
 	}
 
-	result, err := p.Resolve(session)
+	result, err := p.Resolve(sess)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -115,21 +119,21 @@ func TestModelProvider(t *testing.T) {
 
 func TestSessionProvider(t *testing.T) {
 	p := &sessionProvider{}
-	session := &SessionData{
+	sess := &types.SessionData{
 		CWD: "/tmp",
-		Cost: &CostInfo{
+		Cost: &types.CostInfo{
 			TotalDurationMS:   5400000,
 			TotalLinesAdded:   100,
 			TotalLinesRemoved: 50,
 		},
 	}
 
-	result, err := p.Resolve(session)
+	result, err := p.Resolve(sess)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	data := result.(*SessionProviderData)
+	data := result.(*SessionData)
 	if *data.Duration != "1h 30m" {
 		t.Errorf("expected 1h 30m, got %s", *data.Duration)
 	}
@@ -143,9 +147,9 @@ func TestSessionProvider(t *testing.T) {
 
 func TestPwdProvider(t *testing.T) {
 	p := &pwdProvider{}
-	session := &SessionData{CWD: "/home/user/projects/myapp"}
+	sess := &types.SessionData{CWD: "/home/user/projects/myapp"}
 
-	result, err := p.Resolve(session)
+	result, err := p.Resolve(sess)
 	if err != nil {
 		t.Fatal(err)
 	}

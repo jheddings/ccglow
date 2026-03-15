@@ -1,9 +1,14 @@
-package statusline
+package segment
 
-import "fmt"
+import (
+	"fmt"
 
-// RegisterBuiltinSegments adds all built-in segment implementations to the registry.
-func RegisterBuiltinSegments(registry *SegmentRegistry) {
+	"github.com/jheddings/ccnow/internal/provider"
+	"github.com/jheddings/ccnow/internal/types"
+)
+
+// RegisterBuiltin adds all built-in segment implementations to the registry.
+func RegisterBuiltin(registry *Registry) {
 	registry.Register(&literalSegment{})
 	registry.Register(&pwdNameSegment{})
 	registry.Register(&pwdPathSegment{})
@@ -21,12 +26,32 @@ func RegisterBuiltinSegments(registry *SegmentRegistry) {
 	registry.Register(&sessionLinesRemovedSegment{})
 }
 
+// Registry maps segment type names to their implementations.
+type Registry struct {
+	segments map[string]types.Segment
+}
+
+// NewRegistry creates an empty segment registry.
+func NewRegistry() *Registry {
+	return &Registry{segments: make(map[string]types.Segment)}
+}
+
+// Register adds a segment implementation.
+func (r *Registry) Register(seg types.Segment) {
+	r.segments[seg.Name()] = seg
+}
+
+// Get returns the segment for the given type name, or nil.
+func (r *Registry) Get(name string) types.Segment {
+	return r.segments[name]
+}
+
 // --- Literal ---
 
 type literalSegment struct{}
 
 func (s *literalSegment) Name() string { return "literal" }
-func (s *literalSegment) Render(ctx *SegmentContext) *string {
+func (s *literalSegment) Render(ctx *types.SegmentContext) *string {
 	if ctx.Props == nil {
 		return nil
 	}
@@ -41,8 +66,8 @@ func (s *literalSegment) Render(ctx *SegmentContext) *string {
 type pwdNameSegment struct{}
 
 func (s *pwdNameSegment) Name() string { return "pwd.name" }
-func (s *pwdNameSegment) Render(ctx *SegmentContext) *string {
-	if data, ok := ctx.Provider.(*PwdData); ok && data != nil {
+func (s *pwdNameSegment) Render(ctx *types.SegmentContext) *string {
+	if data, ok := ctx.Provider.(*provider.PwdData); ok && data != nil {
 		return &data.Name
 	}
 	return nil
@@ -51,8 +76,8 @@ func (s *pwdNameSegment) Render(ctx *SegmentContext) *string {
 type pwdPathSegment struct{}
 
 func (s *pwdPathSegment) Name() string { return "pwd.path" }
-func (s *pwdPathSegment) Render(ctx *SegmentContext) *string {
-	if data, ok := ctx.Provider.(*PwdData); ok && data != nil && data.Path != "" {
+func (s *pwdPathSegment) Render(ctx *types.SegmentContext) *string {
+	if data, ok := ctx.Provider.(*provider.PwdData); ok && data != nil && data.Path != "" {
 		return &data.Path
 	}
 	return nil
@@ -61,8 +86,8 @@ func (s *pwdPathSegment) Render(ctx *SegmentContext) *string {
 type pwdSmartSegment struct{}
 
 func (s *pwdSmartSegment) Name() string { return "pwd.smart" }
-func (s *pwdSmartSegment) Render(ctx *SegmentContext) *string {
-	if data, ok := ctx.Provider.(*PwdData); ok && data != nil && data.Smart != "" {
+func (s *pwdSmartSegment) Render(ctx *types.SegmentContext) *string {
+	if data, ok := ctx.Provider.(*provider.PwdData); ok && data != nil && data.Smart != "" {
 		return &data.Smart
 	}
 	return nil
@@ -73,8 +98,8 @@ func (s *pwdSmartSegment) Render(ctx *SegmentContext) *string {
 type gitBranchSegment struct{}
 
 func (s *gitBranchSegment) Name() string { return "git.branch" }
-func (s *gitBranchSegment) Render(ctx *SegmentContext) *string {
-	if data, ok := ctx.Provider.(*GitData); ok && data != nil {
+func (s *gitBranchSegment) Render(ctx *types.SegmentContext) *string {
+	if data, ok := ctx.Provider.(*provider.GitData); ok && data != nil {
 		return data.Branch
 	}
 	return nil
@@ -83,8 +108,8 @@ func (s *gitBranchSegment) Render(ctx *SegmentContext) *string {
 type gitInsertionsSegment struct{}
 
 func (s *gitInsertionsSegment) Name() string { return "git.insertions" }
-func (s *gitInsertionsSegment) Render(ctx *SegmentContext) *string {
-	if data, ok := ctx.Provider.(*GitData); ok && data != nil && data.Insertions != nil {
+func (s *gitInsertionsSegment) Render(ctx *types.SegmentContext) *string {
+	if data, ok := ctx.Provider.(*provider.GitData); ok && data != nil && data.Insertions != nil {
 		v := fmt.Sprintf("%d", *data.Insertions)
 		return &v
 	}
@@ -94,8 +119,8 @@ func (s *gitInsertionsSegment) Render(ctx *SegmentContext) *string {
 type gitDeletionsSegment struct{}
 
 func (s *gitDeletionsSegment) Name() string { return "git.deletions" }
-func (s *gitDeletionsSegment) Render(ctx *SegmentContext) *string {
-	if data, ok := ctx.Provider.(*GitData); ok && data != nil && data.Deletions != nil {
+func (s *gitDeletionsSegment) Render(ctx *types.SegmentContext) *string {
+	if data, ok := ctx.Provider.(*provider.GitData); ok && data != nil && data.Deletions != nil {
 		v := fmt.Sprintf("%d", *data.Deletions)
 		return &v
 	}
@@ -107,8 +132,8 @@ func (s *gitDeletionsSegment) Render(ctx *SegmentContext) *string {
 type contextTokensSegment struct{}
 
 func (s *contextTokensSegment) Name() string { return "context.tokens" }
-func (s *contextTokensSegment) Render(ctx *SegmentContext) *string {
-	if data, ok := ctx.Provider.(*ContextData); ok && data != nil && data.Tokens != "" {
+func (s *contextTokensSegment) Render(ctx *types.SegmentContext) *string {
+	if data, ok := ctx.Provider.(*provider.ContextData); ok && data != nil && data.Tokens != "" {
 		return &data.Tokens
 	}
 	return nil
@@ -117,8 +142,8 @@ func (s *contextTokensSegment) Render(ctx *SegmentContext) *string {
 type contextSizeSegment struct{}
 
 func (s *contextSizeSegment) Name() string { return "context.size" }
-func (s *contextSizeSegment) Render(ctx *SegmentContext) *string {
-	if data, ok := ctx.Provider.(*ContextData); ok && data != nil && data.Size != "" {
+func (s *contextSizeSegment) Render(ctx *types.SegmentContext) *string {
+	if data, ok := ctx.Provider.(*provider.ContextData); ok && data != nil && data.Size != "" {
 		return &data.Size
 	}
 	return nil
@@ -127,8 +152,8 @@ func (s *contextSizeSegment) Render(ctx *SegmentContext) *string {
 type contextPercentSegment struct{}
 
 func (s *contextPercentSegment) Name() string { return "context.percent" }
-func (s *contextPercentSegment) Render(ctx *SegmentContext) *string {
-	if data, ok := ctx.Provider.(*ContextData); ok && data != nil && data.Percent != nil {
+func (s *contextPercentSegment) Render(ctx *types.SegmentContext) *string {
+	if data, ok := ctx.Provider.(*provider.ContextData); ok && data != nil && data.Percent != nil {
 		v := fmt.Sprintf("%d%%", *data.Percent)
 		return &v
 	}
@@ -140,8 +165,8 @@ func (s *contextPercentSegment) Render(ctx *SegmentContext) *string {
 type modelNameSegment struct{}
 
 func (s *modelNameSegment) Name() string { return "model.name" }
-func (s *modelNameSegment) Render(ctx *SegmentContext) *string {
-	if data, ok := ctx.Provider.(*ModelData); ok && data != nil {
+func (s *modelNameSegment) Render(ctx *types.SegmentContext) *string {
+	if data, ok := ctx.Provider.(*provider.ModelData); ok && data != nil {
 		return data.Name
 	}
 	return nil
@@ -152,8 +177,8 @@ func (s *modelNameSegment) Render(ctx *SegmentContext) *string {
 type costUSDSegment struct{}
 
 func (s *costUSDSegment) Name() string { return "cost.usd" }
-func (s *costUSDSegment) Render(ctx *SegmentContext) *string {
-	if data, ok := ctx.Provider.(*CostData); ok && data != nil {
+func (s *costUSDSegment) Render(ctx *types.SegmentContext) *string {
+	if data, ok := ctx.Provider.(*provider.CostData); ok && data != nil {
 		return data.USD
 	}
 	return nil
@@ -164,8 +189,8 @@ func (s *costUSDSegment) Render(ctx *SegmentContext) *string {
 type sessionDurationSegment struct{}
 
 func (s *sessionDurationSegment) Name() string { return "session.duration" }
-func (s *sessionDurationSegment) Render(ctx *SegmentContext) *string {
-	if data, ok := ctx.Provider.(*SessionProviderData); ok && data != nil {
+func (s *sessionDurationSegment) Render(ctx *types.SegmentContext) *string {
+	if data, ok := ctx.Provider.(*provider.SessionData); ok && data != nil {
 		return data.Duration
 	}
 	return nil
@@ -174,8 +199,8 @@ func (s *sessionDurationSegment) Render(ctx *SegmentContext) *string {
 type sessionLinesAddedSegment struct{}
 
 func (s *sessionLinesAddedSegment) Name() string { return "session.lines-added" }
-func (s *sessionLinesAddedSegment) Render(ctx *SegmentContext) *string {
-	if data, ok := ctx.Provider.(*SessionProviderData); ok && data != nil && data.LinesAdded != nil {
+func (s *sessionLinesAddedSegment) Render(ctx *types.SegmentContext) *string {
+	if data, ok := ctx.Provider.(*provider.SessionData); ok && data != nil && data.LinesAdded != nil {
 		v := fmt.Sprintf("%d", *data.LinesAdded)
 		return &v
 	}
@@ -185,8 +210,8 @@ func (s *sessionLinesAddedSegment) Render(ctx *SegmentContext) *string {
 type sessionLinesRemovedSegment struct{}
 
 func (s *sessionLinesRemovedSegment) Name() string { return "session.lines-removed" }
-func (s *sessionLinesRemovedSegment) Render(ctx *SegmentContext) *string {
-	if data, ok := ctx.Provider.(*SessionProviderData); ok && data != nil && data.LinesRemoved != nil {
+func (s *sessionLinesRemovedSegment) Render(ctx *types.SegmentContext) *string {
+	if data, ok := ctx.Provider.(*provider.SessionData); ok && data != nil && data.LinesRemoved != nil {
 		v := fmt.Sprintf("%d", *data.LinesRemoved)
 		return &v
 	}
