@@ -3,3 +3,5 @@ dist/
 *.tgz
 .DS_Store
 tmp/
+# Go build output
+/ccnow

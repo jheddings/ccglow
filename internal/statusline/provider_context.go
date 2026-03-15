@@ -1,0 +1,58 @@
+package statusline
+
+import "fmt"
+
+// ContextData holds resolved context window information.
+type ContextData struct {
+	Tokens  string
+	Size    string
+	Percent *int
+}
+
+type contextProvider struct{}
+
+func (p *contextProvider) Name() string { return "context" }
+
+func (p *contextProvider) Resolve(session *SessionData) (any, error) {
+	cw := session.ContextWindow
+	if cw == nil {
+		return &ContextData{}, nil
+	}
+
+	data := &ContextData{}
+
+	totalTokens := 0
+	if cw.CurrentUsage != nil {
+		totalTokens = cw.CurrentUsage.InputTokens +
+			cw.CurrentUsage.CacheCreationInputTokens +
+			cw.CurrentUsage.CacheReadInputTokens
+	}
+
+	data.Tokens = FormatTokens(totalTokens)
+
+	if cw.ContextWindowSize > 0 {
+		data.Size = FormatTokens(cw.ContextWindowSize)
+	}
+
+	if cw.UsedPercentage > 0 || cw.CurrentUsage != nil {
+		pct := cw.UsedPercentage
+		data.Percent = &pct
+	}
+
+	return data, nil
+}
+
+// FormatTokens formats a token count for display (e.g. 1500000 → "1.5M").
+func FormatTokens(total int) string {
+	if total >= 1_000_000 {
+		m := float64(total) / 1_000_000.0
+		if m == float64(int(m)) {
+			return fmt.Sprintf("%dM", int(m))
+		}
+		return fmt.Sprintf("%.1fM", m)
+	}
+	if total >= 1_000 {
+		return fmt.Sprintf("%dK", total/1_000)
+	}
+	return fmt.Sprintf("%d", total)
+}
