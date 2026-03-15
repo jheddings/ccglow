@@ -45,6 +45,8 @@ and handle both SSH and HTTPS formats.
 | `context.tokens`  | Total token count, human-formatted     | `360K`, `1.2M` |
 | `context.size`    | Context window capacity                | `1M`, `200K`   |
 | `context.percent` | Usage as integer percentage            | `36%`          |
+| `context.input`   | Total input tokens, human-formatted    | `162K`         |
+| `context.output`  | Total output tokens, human-formatted   | `45K`          |
 
 Token formatting scales automatically: raw count below 1K, `nK` for thousands,
 `n.nM` for millions.
@@ -60,6 +62,17 @@ Token formatting scales automatically: raw count below 1K, `nK` for thousands,
 | Segment    | Description                | Example Output |
 | ---------- | -------------------------- | -------------- |
 | `cost.usd` | Session cost formatted USD | `$12.50`       |
+
+## Speed — `speed`
+
+| Segment        | Description                                    | Example Output |
+| -------------- | ---------------------------------------------- | -------------- |
+| `speed.input`  | Input token throughput                         | `45 t/s`, `1.2K t/s` |
+| `speed.output` | Output token throughput                        | `82 t/s`       |
+| `speed.total`  | Combined input + output throughput             | `127 t/s`      |
+
+Speed is calculated from total tokens divided by API duration. Formatting
+scales the same way as tokens: raw below 1K, `n.nK t/s` above.
 
 ## Session — `session`
 
