@@ -1,7 +1,6 @@
 package render
 
 import (
-	"log"
 	"strings"
 	"sync"
 
@@ -9,6 +8,7 @@ import (
 	"github.com/jheddings/ccglow/internal/segment"
 	"github.com/jheddings/ccglow/internal/style"
 	"github.com/jheddings/ccglow/internal/types"
+	"github.com/rs/zerolog/log"
 )
 
 var conditionCache = make(map[string]*condition.Condition)
@@ -27,7 +27,7 @@ func getCondition(expr string) *condition.Condition {
 
 	c, err := condition.Compile(expr)
 	if err != nil {
-		log.Printf("ccglow: invalid when expression %q: %v", expr, err)
+		log.Warn().Err(err).Str("expr", expr).Msg("invalid when expression")
 		conditionCache[expr] = nil
 		return nil
 	}
