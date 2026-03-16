@@ -44,13 +44,13 @@ That's it. One binary, no runtime dependencies, no config files required.
 
 Five built-in layouts, from minimal to maximal.
 
-| Preset | Description | Prerequisites |
-|--------|-------------|---------------|
-| [**default**](internal/preset/default.json) | The essentials: path, branch, diffs, context, duration | None |
-| [**minimal**](internal/preset/minimal.json) | Smart and quiet — shows data only when it matters | None |
-| [**full**](internal/preset/full.json) | Everything, all at once | None |
-| [**f1**](internal/preset/f1.json) | Multi-line, powerline-styled, truecolor | [Nerd Font](https://www.nerdfonts.com/), truecolor terminal |
-| [**moonwalk**](internal/preset/moonwalk.json) | Dark forest theme with powerline separators | [Nerd Font](https://www.nerdfonts.com/), truecolor terminal |
+| Preset                                        | Description                                            | Prerequisites                                               |
+| --------------------------------------------- | ------------------------------------------------------ | ----------------------------------------------------------- |
+| [**default**](internal/preset/default.json)   | The essentials: path, branch, diffs, context, duration | None                                                        |
+| [**minimal**](internal/preset/minimal.json)   | Smart and quiet — shows data only when it matters      | None                                                        |
+| [**full**](internal/preset/full.json)         | Everything, all at once                                | None                                                        |
+| [**f1**](internal/preset/f1.json)             | Multi-line, powerline-styled, truecolor                | [Nerd Font](https://www.nerdfonts.com/), truecolor terminal |
+| [**moonwalk**](internal/preset/moonwalk.json) | Dark forest theme with powerline separators            | [Nerd Font](https://www.nerdfonts.com/), truecolor terminal |
 
 Switch presets with `--preset`:
 

@@ -12,8 +12,8 @@ type testProvider struct {
 	Enabled bool
 }
 
-func strPtr(s string) *string    { return &s }
-func intPtr(n int) *int          { return &n }
+func strPtr(s string) *string     { return &s }
+func intPtr(n int) *int           { return &n }
 func floatPtr(f float64) *float64 { return &f }
 
 func TestCompile_Valid(t *testing.T) {

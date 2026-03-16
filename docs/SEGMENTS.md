@@ -10,11 +10,11 @@ collapses out of the output.
 
 ## Directory — `pwd`
 
-| Segment     | Description                                                                 | Example Output        |
-| ----------- | --------------------------------------------------------------------------- | --------------------- |
-| `pwd.name`  | Directory basename                                                          | `ccglow`              |
-| `pwd.path`  | Full path prefix (everything before the basename, with trailing slash)      | `~/Projects/`         |
-| `pwd.smart` | Smart-truncated path — abbreviates intermediate directories for deep paths  | `~/P/…/`              |
+| Segment     | Description                                                                | Example Output |
+| ----------- | -------------------------------------------------------------------------- | -------------- |
+| `pwd.name`  | Directory basename                                                         | `ccglow`       |
+| `pwd.path`  | Full path prefix (everything before the basename, with trailing slash)     | `~/Projects/`  |
+| `pwd.smart` | Smart-truncated path — abbreviates intermediate directories for deep paths | `~/P/…/`       |
 
 `pwd.smart` keeps the first and last path components readable and abbreviates
 the middle when nesting gets deep. Pair it with `pwd.name` for a compact but
@@ -22,17 +22,17 @@ navigable path display.
 
 ## Git — `git`
 
-| Segment          | Description                                          | Example Output |
-| ---------------- | ---------------------------------------------------- | -------------- |
-| `git.branch`     | Current branch name                                  | `main`         |
-| `git.insertions` | Lines added (staged + unstaged combined)              | `42`           |
-| `git.deletions`  | Lines removed (staged + unstaged combined)            | `17`           |
-| `git.modified`   | Count of modified (unstaged) files                   | `3`            |
-| `git.staged`     | Count of staged files                                | `2`            |
-| `git.untracked`  | Count of untracked files                             | `5`            |
-| `git.owner`      | Repository owner extracted from the remote URL       | `jheddings`    |
-| `git.repo`       | Repository name extracted from the remote URL        | `ccglow`       |
-| `git.worktree`   | Linked worktree name (empty in main working copy)    | `docs-update`  |
+| Segment          | Description                                       | Example Output |
+| ---------------- | ------------------------------------------------- | -------------- |
+| `git.branch`     | Current branch name                               | `main`         |
+| `git.insertions` | Lines added (staged + unstaged combined)          | `42`           |
+| `git.deletions`  | Lines removed (staged + unstaged combined)        | `17`           |
+| `git.modified`   | Count of modified (unstaged) files                | `3`            |
+| `git.staged`     | Count of staged files                             | `2`            |
+| `git.untracked`  | Count of untracked files                          | `5`            |
+| `git.owner`      | Repository owner extracted from the remote URL    | `jheddings`    |
+| `git.repo`       | Repository name extracted from the remote URL     | `ccglow`       |
+| `git.worktree`   | Linked worktree name (empty in main working copy) | `docs-update`  |
 
 All git segments require a git repository in the current working directory.
 Remote-based segments (`git.owner`, `git.repo`) parse the `origin` remote URL
@@ -40,14 +40,14 @@ and handle both SSH and HTTPS formats.
 
 ## Context — `context`
 
-| Segment                     | Description                            | Example Output |
-| --------------------------- | -------------------------------------- | -------------- |
-| `context.tokens`            | Total token count, human-formatted     | `360K`, `1.2M` |
-| `context.size`              | Context window capacity                | `1M`, `200K`   |
-| `context.percent.used`      | Usage as integer percentage            | `36%`          |
-| `context.percent.remaining` | Remaining capacity as percentage       | `64%`          |
-| `context.input`             | Total input tokens, human-formatted    | `162K`         |
-| `context.output`            | Total output tokens, human-formatted   | `45K`          |
+| Segment                     | Description                          | Example Output |
+| --------------------------- | ------------------------------------ | -------------- |
+| `context.tokens`            | Total token count, human-formatted   | `360K`, `1.2M` |
+| `context.size`              | Context window capacity              | `1M`, `200K`   |
+| `context.percent.used`      | Usage as integer percentage          | `36%`          |
+| `context.percent.remaining` | Remaining capacity as percentage     | `64%`          |
+| `context.input`             | Total input tokens, human-formatted  | `162K`         |
+| `context.output`            | Total output tokens, human-formatted | `45K`          |
 
 Token formatting scales automatically: raw count below 1K, `nK` for thousands,
 `n.nM` for millions.
@@ -67,31 +67,31 @@ Token formatting scales automatically: raw count below 1K, `nK` for thousands,
 
 ## Speed — `speed`
 
-| Segment        | Description                                    | Example Output        |
-| -------------- | ---------------------------------------------- | --------------------- |
-| `speed.input`  | Input token throughput                         | `45 t/s`, `1.2K t/s`  |
-| `speed.output` | Output token throughput                        | `82 t/s`              |
-| `speed.total`  | Combined input + output throughput             | `127 t/s`             |
+| Segment        | Description                        | Example Output       |
+| -------------- | ---------------------------------- | -------------------- |
+| `speed.input`  | Input token throughput             | `45 t/s`, `1.2K t/s` |
+| `speed.output` | Output token throughput            | `82 t/s`             |
+| `speed.total`  | Combined input + output throughput | `127 t/s`            |
 
 Speed is calculated from total tokens divided by API duration. Formatting
 scales the same way as tokens: raw below 1K, `n.nK t/s` above.
 
 ## Session — `session`
 
-| Segment                  | Description                          | Example Output  |
-| ------------------------ | ------------------------------------ | --------------- |
-| `session.duration.total` | Wall-clock session time              | `2h 15m`, `45m` |
-| `session.duration.api`   | Time spent on API calls              | `8m`, `1h 2m`   |
-| `session.id`             | Session identifier                   | `abc-123`       |
-| `session.lines-added`    | Total lines added this session       | `1380`          |
-| `session.lines-removed`  | Total lines removed this session     | `21`            |
+| Segment                  | Description                      | Example Output  |
+| ------------------------ | -------------------------------- | --------------- |
+| `session.duration.total` | Wall-clock session time          | `2h 15m`, `45m` |
+| `session.duration.api`   | Time spent on API calls          | `8m`, `1h 2m`   |
+| `session.id`             | Session identifier               | `abc-123`       |
+| `session.lines-added`    | Total lines added this session   | `1380`          |
+| `session.lines-removed`  | Total lines removed this session | `21`            |
 
 ## Claude — `claude`
 
-| Segment          | Description                        | Example Output |
-| ---------------- | ---------------------------------- | -------------- |
-| `claude.version` | Claude Code application version    | `2.1.75`       |
-| `claude.style`   | Current output style               | `concise`      |
+| Segment          | Description                     | Example Output |
+| ---------------- | ------------------------------- | -------------- |
+| `claude.version` | Claude Code application version | `2.1.75`       |
+| `claude.style`   | Current output style            | `concise`      |
 
 ## Utility Segments
 
@@ -100,7 +100,7 @@ These segments don't use a provider — they're structural.
 | Segment   | Description                                                        |
 | --------- | ------------------------------------------------------------------ |
 | `literal` | Renders static text. Requires a `text` property (see below).       |
-| `newline` | Renders a line break — use this for multi-line statusline layouts.  |
+| `newline` | Renders a line break — use this for multi-line statusline layouts. |
 
 ### The `literal` segment
 

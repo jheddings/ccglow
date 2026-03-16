@@ -24,16 +24,16 @@ Expressions can reference three kinds of values:
 Dot-prefixed names access fields from the segment's provider. These are the
 Go struct field names, lowercased.
 
-| Provider | Available Fields |
-|----------|-----------------|
+| Provider | Available Fields                                                                                             |
+| -------- | ------------------------------------------------------------------------------------------------------------ |
 | git      | `.branch`, `.insertions`, `.deletions`, `.modified`, `.staged`, `.untracked`, `.owner`, `.repo`, `.worktree` |
-| context  | `.tokens`, `.size`, `.percent`, `.remaining`, `.input`, `.output` |
-| model    | `.name`, `.id` |
-| cost     | `.usd` |
-| speed    | `.input`, `.output`, `.total` |
-| session  | `.duration`, `.apiduration`, `.linesadded`, `.linesremoved`, `.id` |
-| pwd      | `.name`, `.path`, `.smart` |
-| claude   | `.version`, `.style` |
+| context  | `.tokens`, `.size`, `.percent`, `.remaining`, `.input`, `.output`                                            |
+| model    | `.name`, `.id`                                                                                               |
+| cost     | `.usd`                                                                                                       |
+| speed    | `.input`, `.output`, `.total`                                                                                |
+| session  | `.duration`, `.apiduration`, `.linesadded`, `.linesremoved`, `.id`                                           |
+| pwd      | `.name`, `.path`, `.smart`                                                                                   |
+| claude   | `.version`, `.style`                                                                                         |
 
 ### `value` — Raw data value
 
@@ -151,17 +151,20 @@ fall back to the directory name.
 ## Examples
 
 **Show branch only when not on main:**
+
 ```json
 { "segment": "git.branch", "when": ".branch != '' && .branch != 'main'" }
 ```
 
 **Show dirty indicators only when non-zero:**
+
 ```json
 { "segment": "git.modified", "when": "value > 0", "style": { "prefix": " ~" } }
 { "segment": "git.untracked", "when": "value > 0", "style": { "prefix": " ?" } }
 ```
 
 **Context warning at high usage:**
+
 ```json
 { "segment": "context.percent.used", "when": ".percent >= 80", "style": { "color": "red" } }
 { "segment": "context.percent.used", "when": ".percent >= 50 && .percent < 80", "style": { "color": "yellow" } }
@@ -171,6 +174,7 @@ Two copies of the same segment with mutually exclusive conditions — red
 above 80%, yellow between 50-80%, hidden below 50%.
 
 **Show speed only when available:**
+
 ```json
 { "segment": "speed.output", "when": "text != ''" }
 ```

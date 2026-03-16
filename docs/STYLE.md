@@ -6,14 +6,14 @@ renderer handles presentation.
 
 ## Attributes
 
-| Attribute | Type    | Description                                              |
-| --------- | ------- | -------------------------------------------------------- |
-| `color`   | string  | Text (foreground) color                                  |
-| `bgcolor` | string  | Background color                                         |
-| `bold`    | boolean | Bold text                                                |
-| `italic`  | boolean | Italic text                                              |
-| `prefix`  | string  | Text prepended before the segment value                  |
-| `suffix`  | string  | Text appended after the segment value                    |
+| Attribute | Type    | Description                             |
+| --------- | ------- | --------------------------------------- |
+| `color`   | string  | Text (foreground) color                 |
+| `bgcolor` | string  | Background color                        |
+| `bold`    | boolean | Bold text                               |
+| `italic`  | boolean | Italic text                             |
+| `prefix`  | string  | Text prepended before the segment value |
+| `suffix`  | string  | Text appended after the segment value   |
 
 `prefix` and `suffix` are included in the styled output — they inherit the
 same color, bold, and italic settings as the segment value.
@@ -43,16 +43,16 @@ ccglow supports three color tiers. Use whichever fits your terminal:
 
 The standard terminal palette. These work everywhere.
 
-| Color          | Bright Variant   |
-| -------------- | ---------------- |
-| `black`        | `blackBright`    |
-| `red`          | `redBright`      |
-| `green`        | `greenBright`    |
-| `yellow`       | `yellowBright`   |
-| `blue`         | `blueBright`     |
-| `magenta`      | `magentaBright`  |
-| `cyan`         | `cyanBright`     |
-| `white`        | `whiteBright`    |
+| Color     | Bright Variant  |
+| --------- | --------------- |
+| `black`   | `blackBright`   |
+| `red`     | `redBright`     |
+| `green`   | `greenBright`   |
+| `yellow`  | `yellowBright`  |
+| `blue`    | `blueBright`    |
+| `magenta` | `magentaBright` |
+| `cyan`    | `cyanBright`    |
+| `white`   | `whiteBright`   |
 
 ### 256-Color Palette
 
