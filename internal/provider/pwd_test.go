@@ -16,11 +16,12 @@ func TestPwdProvider(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if result.Values["pwd.name"] != "myapp" {
-		t.Errorf("expected myapp, got %s", result.Values["pwd.name"])
+	pwd := result.Values["pwd"].(map[string]any)
+	if pwd["name"] != "myapp" {
+		t.Errorf("expected myapp, got %s", pwd["name"])
 	}
-	if result.Values["pwd.path"] != "/home/user/projects/" {
-		t.Errorf("expected /home/user/projects/, got %s", result.Values["pwd.path"])
+	if pwd["path"] != "/home/user/projects/" {
+		t.Errorf("expected /home/user/projects/, got %s", pwd["path"])
 	}
 }
 

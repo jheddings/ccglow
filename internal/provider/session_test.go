@@ -27,6 +27,14 @@ func TestFormatDuration(t *testing.T) {
 	}
 }
 
+func sessionValues(result *types.ProviderResult) map[string]any {
+	return result.Values["session"].(map[string]any)
+}
+
+func sessionDuration(result *types.ProviderResult) map[string]any {
+	return sessionValues(result)["duration"].(map[string]any)
+}
+
 func TestSessionProvider(t *testing.T) {
 	p := &sessionProvider{}
 	sess := &types.SessionData{
@@ -44,17 +52,20 @@ func TestSessionProvider(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if result.Values["session.duration.total"] != "1h 30m" {
-		t.Errorf("expected 1h 30m, got %s", result.Values["session.duration.total"])
+	dur := sessionDuration(result)
+	if dur["total"] != "1h 30m" {
+		t.Errorf("expected 1h 30m, got %s", dur["total"])
 	}
-	if result.Values["session.duration.api"] != "8m" {
-		t.Errorf("expected 8m, got %s", result.Values["session.duration.api"])
+	if dur["api"] != "8m" {
+		t.Errorf("expected 8m, got %s", dur["api"])
 	}
-	if result.Values["session.lines-added"] != 100 {
-		t.Errorf("expected 100 lines added, got %v", result.Values["session.lines-added"])
+
+	s := sessionValues(result)
+	if s["lines-added"] != 100 {
+		t.Errorf("expected 100 lines added, got %v", s["lines-added"])
 	}
-	if result.Values["session.lines-removed"] != 50 {
-		t.Errorf("expected 50 lines removed, got %v", result.Values["session.lines-removed"])
+	if s["lines-removed"] != 50 {
+		t.Errorf("expected 50 lines removed, got %v", s["lines-removed"])
 	}
 }
 
@@ -70,8 +81,9 @@ func TestSessionProviderID(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if result.Values["session.id"] != "abc-123" {
-		t.Errorf("expected abc-123, got %v", result.Values["session.id"])
+	s := sessionValues(result)
+	if s["id"] != "abc-123" {
+		t.Errorf("expected abc-123, got %v", s["id"])
 	}
 }
 
@@ -84,7 +96,8 @@ func TestSessionProviderNoID(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if result.Values["session.id"] != "" {
-		t.Errorf("expected empty ID, got %v", result.Values["session.id"])
+	s := sessionValues(result)
+	if s["id"] != "" {
+		t.Errorf("expected empty ID, got %v", s["id"])
 	}
 }

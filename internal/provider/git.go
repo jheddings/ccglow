@@ -21,18 +21,20 @@ func (p *gitProvider) Name() string { return "git" }
 func (p *gitProvider) Resolve(session *types.SessionData) (*types.ProviderResult, error) {
 	cwd := session.CWD
 
+	git := map[string]any{
+		"branch":     "",
+		"insertions": 0,
+		"deletions":  0,
+		"modified":   0,
+		"staged":     0,
+		"untracked":  0,
+		"worktree":   "",
+		"owner":      "",
+		"repo":       "",
+	}
+
 	result := &types.ProviderResult{
-		Values: map[string]any{
-			"git.branch":     "",
-			"git.insertions": 0,
-			"git.deletions":  0,
-			"git.modified":   0,
-			"git.staged":     0,
-			"git.untracked":  0,
-			"git.worktree":   "",
-			"git.owner":      "",
-			"git.repo":       "",
-		},
+		Values: map[string]any{"git": git},
 	}
 
 	if !gitAvailable(cwd) {
@@ -40,35 +42,35 @@ func (p *gitProvider) Resolve(session *types.SessionData) (*types.ProviderResult
 	}
 
 	if branch, err := gitExec(cwd, "branch", "--show-current"); err == nil && branch != "" {
-		result.Values["git.branch"] = branch
+		git["branch"] = branch
 	}
 
 	if diff, err := gitExec(cwd, "diff", "--shortstat", "HEAD"); err == nil && diff != "" {
 		if m := insertionRe.FindStringSubmatch(diff); len(m) > 1 {
 			var n int
 			fmt.Sscanf(m[1], "%d", &n)
-			result.Values["git.insertions"] = n
+			git["insertions"] = n
 		}
 		if m := deletionRe.FindStringSubmatch(diff); len(m) > 1 {
 			var n int
 			fmt.Sscanf(m[1], "%d", &n)
-			result.Values["git.deletions"] = n
+			git["deletions"] = n
 		}
 	}
 
 	if mod, stg, unt, err := parseGitStatus(cwd); err == nil {
-		result.Values["git.modified"] = mod
-		result.Values["git.staged"] = stg
-		result.Values["git.untracked"] = unt
+		git["modified"] = mod
+		git["staged"] = stg
+		git["untracked"] = unt
 	}
 
 	if wt := detectWorktree(cwd); wt != "" {
-		result.Values["git.worktree"] = wt
+		git["worktree"] = wt
 	}
 
 	if owner, repo, err := parseRemoteOwnerRepo(cwd); err == nil {
-		result.Values["git.owner"] = owner
-		result.Values["git.repo"] = repo
+		git["owner"] = owner
+		git["repo"] = repo
 	}
 
 	return result, nil

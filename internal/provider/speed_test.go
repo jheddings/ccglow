@@ -6,6 +6,10 @@ import (
 	"github.com/jheddings/ccglow/internal/types"
 )
 
+func speedValues(result *types.ProviderResult) map[string]any {
+	return result.Values["speed"].(map[string]any)
+}
+
 func TestSpeedProvider(t *testing.T) {
 	p := &speedProvider{}
 	inputTokens := 10000
@@ -26,14 +30,15 @@ func TestSpeedProvider(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if result.Values["speed.input"] != "2.0K t/s" {
-		t.Errorf("expected Input '2.0K t/s', got %v", result.Values["speed.input"])
+	sp := speedValues(result)
+	if sp["input"] != "2.0K t/s" {
+		t.Errorf("expected Input '2.0K t/s', got %v", sp["input"])
 	}
-	if result.Values["speed.output"] != "1.0K t/s" {
-		t.Errorf("expected Output '1.0K t/s', got %v", result.Values["speed.output"])
+	if sp["output"] != "1.0K t/s" {
+		t.Errorf("expected Output '1.0K t/s', got %v", sp["output"])
 	}
-	if result.Values["speed.total"] != "3.0K t/s" {
-		t.Errorf("expected Total '3.0K t/s', got %v", result.Values["speed.total"])
+	if sp["total"] != "3.0K t/s" {
+		t.Errorf("expected Total '3.0K t/s', got %v", sp["total"])
 	}
 }
 
@@ -53,8 +58,9 @@ func TestSpeedProviderZeroDuration(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if result.Values["speed.input"] != "" {
-		t.Errorf("expected empty Input for zero duration, got %v", result.Values["speed.input"])
+	sp := speedValues(result)
+	if sp["input"] != "" {
+		t.Errorf("expected empty Input for zero duration, got %v", sp["input"])
 	}
 }
 
@@ -70,7 +76,8 @@ func TestSpeedProviderNilContextWindow(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if result.Values["speed.input"] != "" || result.Values["speed.output"] != "" || result.Values["speed.total"] != "" {
+	sp := speedValues(result)
+	if sp["input"] != "" || sp["output"] != "" || sp["total"] != "" {
 		t.Error("expected all empty fields when ContextWindow is nil")
 	}
 }
@@ -90,7 +97,8 @@ func TestSpeedProviderNilCost(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if result.Values["speed.input"] != "" || result.Values["speed.output"] != "" || result.Values["speed.total"] != "" {
+	sp := speedValues(result)
+	if sp["input"] != "" || sp["output"] != "" || sp["total"] != "" {
 		t.Error("expected all empty fields when Cost is nil")
 	}
 }
@@ -111,14 +119,15 @@ func TestSpeedProviderPartialTokens(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if result.Values["speed.input"] != "5.0K t/s" {
-		t.Errorf("expected Input '5.0K t/s', got %v", result.Values["speed.input"])
+	sp := speedValues(result)
+	if sp["input"] != "5.0K t/s" {
+		t.Errorf("expected Input '5.0K t/s', got %v", sp["input"])
 	}
-	if result.Values["speed.output"] != "" {
-		t.Errorf("expected empty Output, got %v", result.Values["speed.output"])
+	if sp["output"] != "" {
+		t.Errorf("expected empty Output, got %v", sp["output"])
 	}
-	if result.Values["speed.total"] != "" {
-		t.Errorf("expected empty Total when output missing, got %v", result.Values["speed.total"])
+	if sp["total"] != "" {
+		t.Errorf("expected empty Total when output missing, got %v", sp["total"])
 	}
 }
 

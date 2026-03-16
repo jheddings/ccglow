@@ -54,6 +54,10 @@ func initTempRepo(t *testing.T) string {
 	return dir
 }
 
+func gitValues(result *types.ProviderResult) map[string]any {
+	return result.Values["git"].(map[string]any)
+}
+
 func TestGitStatusCounts(t *testing.T) {
 	skipWithoutGit(t)
 	dir := initTempRepo(t)
@@ -77,14 +81,15 @@ func TestGitStatusCounts(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if result.Values["git.modified"] != 1 {
-		t.Errorf("expected 1 modified, got %v", result.Values["git.modified"])
+	git := gitValues(result)
+	if git["modified"] != 1 {
+		t.Errorf("expected 1 modified, got %v", git["modified"])
 	}
-	if result.Values["git.staged"] != 1 {
-		t.Errorf("expected 1 staged, got %v", result.Values["git.staged"])
+	if git["staged"] != 1 {
+		t.Errorf("expected 1 staged, got %v", git["staged"])
 	}
-	if result.Values["git.untracked"] != 1 {
-		t.Errorf("expected 1 untracked, got %v", result.Values["git.untracked"])
+	if git["untracked"] != 1 {
+		t.Errorf("expected 1 untracked, got %v", git["untracked"])
 	}
 }
 
@@ -99,14 +104,15 @@ func TestGitStatusClean(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if result.Values["git.modified"] != 0 {
-		t.Errorf("expected 0 modified, got %v", result.Values["git.modified"])
+	git := gitValues(result)
+	if git["modified"] != 0 {
+		t.Errorf("expected 0 modified, got %v", git["modified"])
 	}
-	if result.Values["git.staged"] != 0 {
-		t.Errorf("expected 0 staged, got %v", result.Values["git.staged"])
+	if git["staged"] != 0 {
+		t.Errorf("expected 0 staged, got %v", git["staged"])
 	}
-	if result.Values["git.untracked"] != 0 {
-		t.Errorf("expected 0 untracked, got %v", result.Values["git.untracked"])
+	if git["untracked"] != 0 {
+		t.Errorf("expected 0 untracked, got %v", git["untracked"])
 	}
 }
 
@@ -129,8 +135,9 @@ func TestGitWorktreeDetection(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if result.Values["git.worktree"] != "my-worktree" {
-		t.Errorf("expected worktree name 'my-worktree', got %q", result.Values["git.worktree"])
+	git := gitValues(result)
+	if git["worktree"] != "my-worktree" {
+		t.Errorf("expected worktree name 'my-worktree', got %q", git["worktree"])
 	}
 }
 
@@ -152,11 +159,12 @@ func TestGitRemoteOwnerRepo(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if result.Values["git.owner"] != "myowner" {
-		t.Errorf("expected owner 'myowner', got %q", result.Values["git.owner"])
+	git := gitValues(result)
+	if git["owner"] != "myowner" {
+		t.Errorf("expected owner 'myowner', got %q", git["owner"])
 	}
-	if result.Values["git.repo"] != "myrepo" {
-		t.Errorf("expected repo 'myrepo', got %q", result.Values["git.repo"])
+	if git["repo"] != "myrepo" {
+		t.Errorf("expected repo 'myrepo', got %q", git["repo"])
 	}
 }
 
@@ -178,11 +186,12 @@ func TestGitRemoteSSH(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if result.Values["git.owner"] != "sshowner" {
-		t.Errorf("expected owner 'sshowner', got %q", result.Values["git.owner"])
+	git := gitValues(result)
+	if git["owner"] != "sshowner" {
+		t.Errorf("expected owner 'sshowner', got %q", git["owner"])
 	}
-	if result.Values["git.repo"] != "sshrepo" {
-		t.Errorf("expected repo 'sshrepo', got %q", result.Values["git.repo"])
+	if git["repo"] != "sshrepo" {
+		t.Errorf("expected repo 'sshrepo', got %q", git["repo"])
 	}
 }
 
@@ -199,11 +208,12 @@ func TestGitRemoteNoOrigin(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if result.Values["git.owner"] != "" {
-		t.Errorf("expected empty Owner, got %q", result.Values["git.owner"])
+	git := gitValues(result)
+	if git["owner"] != "" {
+		t.Errorf("expected empty Owner, got %q", git["owner"])
 	}
-	if result.Values["git.repo"] != "" {
-		t.Errorf("expected empty Repo, got %q", result.Values["git.repo"])
+	if git["repo"] != "" {
+		t.Errorf("expected empty Repo, got %q", git["repo"])
 	}
 }
 
@@ -218,7 +228,8 @@ func TestGitWorktreeMainCopy(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if result.Values["git.worktree"] != "" {
-		t.Errorf("expected empty Worktree in main copy, got %q", result.Values["git.worktree"])
+	git := gitValues(result)
+	if git["worktree"] != "" {
+		t.Errorf("expected empty Worktree in main copy, got %q", git["worktree"])
 	}
 }

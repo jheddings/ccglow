@@ -22,9 +22,11 @@ func (p *pwdProvider) Resolve(session *types.SessionData) (*types.ProviderResult
 
 	return &types.ProviderResult{
 		Values: map[string]any{
-			"pwd.name":  name,
-			"pwd.path":  dir,
-			"pwd.smart": smartPrefix(cwd),
+			"pwd": map[string]any{
+				"name":  name,
+				"path":  dir,
+				"smart": smartPrefix(cwd),
+			},
 		},
 	}, nil
 }

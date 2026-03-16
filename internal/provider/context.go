@@ -11,15 +11,19 @@ type contextProvider struct{}
 func (p *contextProvider) Name() string { return "context" }
 
 func (p *contextProvider) Resolve(session *types.SessionData) (*types.ProviderResult, error) {
-	result := &types.ProviderResult{
-		Values: map[string]any{
-			"context.tokens":            "",
-			"context.size":              "",
-			"context.percent.used":      0,
-			"context.percent.remaining": 0,
-			"context.input":             "",
-			"context.output":            "",
+	ctx := map[string]any{
+		"tokens": "",
+		"size":   "",
+		"percent": map[string]any{
+			"used":      0,
+			"remaining": 0,
 		},
+		"input":  "",
+		"output": "",
+	}
+
+	result := &types.ProviderResult{
+		Values: map[string]any{"context": ctx},
 		Formats: map[string]string{
 			"context.percent.used":      "%d%%",
 			"context.percent.remaining": "%d%%",
@@ -38,28 +42,29 @@ func (p *contextProvider) Resolve(session *types.SessionData) (*types.ProviderRe
 			cw.CurrentUsage.CacheReadInputTokens
 	}
 
-	result.Values["context.tokens"] = FormatTokens(totalTokens)
+	ctx["tokens"] = FormatTokens(totalTokens)
 
 	if cw.ContextWindowSize > 0 {
-		result.Values["context.size"] = FormatTokens(cw.ContextWindowSize)
+		ctx["size"] = FormatTokens(cw.ContextWindowSize)
 	}
 
+	pct := ctx["percent"].(map[string]any)
 	if cw.UsedPercentage > 0 || cw.CurrentUsage != nil {
-		result.Values["context.percent.used"] = cw.UsedPercentage
+		pct["used"] = cw.UsedPercentage
 	}
 
 	if cw.RemainingPercentage > 0 || cw.CurrentUsage != nil {
-		result.Values["context.percent.remaining"] = cw.RemainingPercentage
+		pct["remaining"] = cw.RemainingPercentage
 	}
 
 	if cw.TotalInputTokens != nil {
-		result.Values["context.input"] = FormatTokens(*cw.TotalInputTokens)
+		ctx["input"] = FormatTokens(*cw.TotalInputTokens)
 	} else if totalTokens > 0 {
-		result.Values["context.input"] = FormatTokens(totalTokens)
+		ctx["input"] = FormatTokens(totalTokens)
 	}
 
 	if cw.TotalOutputTokens != nil {
-		result.Values["context.output"] = FormatTokens(*cw.TotalOutputTokens)
+		ctx["output"] = FormatTokens(*cw.TotalOutputTokens)
 	}
 
 	return result, nil

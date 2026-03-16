@@ -11,13 +11,13 @@ type costProvider struct{}
 func (p *costProvider) Name() string { return "cost" }
 
 func (p *costProvider) Resolve(session *types.SessionData) (*types.ProviderResult, error) {
-	result := &types.ProviderResult{
-		Values: map[string]any{
-			"cost.usd": "",
-		},
+	cost := map[string]any{
+		"usd": "",
 	}
 	if session.Cost != nil {
-		result.Values["cost.usd"] = fmt.Sprintf("$%.2f", session.Cost.TotalCostUSD)
+		cost["usd"] = fmt.Sprintf("$%.2f", session.Cost.TotalCostUSD)
 	}
-	return result, nil
+	return &types.ProviderResult{
+		Values: map[string]any{"cost": cost},
+	}, nil
 }

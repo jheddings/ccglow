@@ -11,12 +11,14 @@ type speedProvider struct{}
 func (p *speedProvider) Name() string { return "speed" }
 
 func (p *speedProvider) Resolve(session *types.SessionData) (*types.ProviderResult, error) {
+	speed := map[string]any{
+		"input":  "",
+		"output": "",
+		"total":  "",
+	}
+
 	result := &types.ProviderResult{
-		Values: map[string]any{
-			"speed.input":  "",
-			"speed.output": "",
-			"speed.total":  "",
-		},
+		Values: map[string]any{"speed": speed},
 	}
 
 	cw := session.ContextWindow
@@ -28,18 +30,18 @@ func (p *speedProvider) Resolve(session *types.SessionData) (*types.ProviderResu
 	durationSec := cost.TotalAPIDurationMS / 1000.0
 
 	if cw.TotalInputTokens != nil {
-		speed := float64(*cw.TotalInputTokens) / durationSec
-		result.Values["speed.input"] = FormatSpeed(speed)
+		s := float64(*cw.TotalInputTokens) / durationSec
+		speed["input"] = FormatSpeed(s)
 	}
 
 	if cw.TotalOutputTokens != nil {
-		speed := float64(*cw.TotalOutputTokens) / durationSec
-		result.Values["speed.output"] = FormatSpeed(speed)
+		s := float64(*cw.TotalOutputTokens) / durationSec
+		speed["output"] = FormatSpeed(s)
 	}
 
 	if cw.TotalInputTokens != nil && cw.TotalOutputTokens != nil {
-		speed := float64(*cw.TotalInputTokens+*cw.TotalOutputTokens) / durationSec
-		result.Values["speed.total"] = FormatSpeed(speed)
+		s := float64(*cw.TotalInputTokens+*cw.TotalOutputTokens) / durationSec
+		speed["total"] = FormatSpeed(s)
 	}
 
 	return result, nil

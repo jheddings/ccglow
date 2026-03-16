@@ -5,7 +5,6 @@ import (
 	"sync"
 
 	"github.com/jheddings/ccglow/internal/condition"
-	"github.com/jheddings/ccglow/internal/segment"
 	"github.com/jheddings/ccglow/internal/style"
 	"github.com/jheddings/ccglow/internal/types"
 	"github.com/rs/zerolog/log"
@@ -39,7 +38,7 @@ func isEnabled(node *types.SegmentNode, session *types.SessionData) bool {
 	if node.EnabledFn != nil {
 		defer func() {
 			if r := recover(); r != nil {
-				log.Warn().Str("type", node.Type).Interface("panic", r).Msg("enabledFn panicked")
+				log.Warn().Interface("panic", r).Msg("enabledFn panicked")
 			}
 		}()
 		return node.EnabledFn(session)
@@ -52,32 +51,30 @@ func isEnabled(node *types.SegmentNode, session *types.SessionData) bool {
 
 func renderNode(
 	node *types.SegmentNode,
-	segments *segment.Registry,
 	session *types.SessionData,
-	segmentValues map[string]any,
+	env map[string]any,
 	defaultFormats map[string]string,
-	conditionEnv map[string]any,
 ) *string {
 	if !isEnabled(node, session) {
 		return nil
 	}
 
-	// SegmentGroup: evaluate when, then render children
+	// Composite: evaluate when, then render children
 	if len(node.Children) > 0 {
 		if node.When != "" {
 			c := getCondition(node.When)
 			if c == nil {
 				return nil // compilation failed
 			}
-			env := condition.BuildSegmentEnv(conditionEnv, nil, "")
-			if !c.Evaluate(env) {
+			segEnv := condition.BuildSegmentEnv(env, nil, "")
+			if !c.Evaluate(segEnv) {
 				return nil
 			}
 		}
 
 		var parts []string
 		for i := range node.Children {
-			rendered := renderNode(&node.Children[i], segments, session, segmentValues, defaultFormats, conditionEnv)
+			rendered := renderNode(&node.Children[i], session, env, defaultFormats)
 			if rendered != nil {
 				parts = append(parts, *rendered)
 			}
@@ -90,35 +87,34 @@ func renderNode(
 		return &styled
 	}
 
-	// Built-in segment: delegate to registered segment (literal, newline)
-	seg := segments.Get(node.Type)
-	if seg != nil {
-		ctx := &types.SegmentContext{
-			Session: session,
-			Props:   node.Props,
-		}
+	// Resolve raw value
+	var raw any
+	var hasValue bool
 
-		value := seg.Render(ctx)
-		if value == nil {
+	if node.Value != nil {
+		raw = node.Value
+		hasValue = true
+	} else if node.Expr != "" {
+		result, err := condition.Eval(node.Expr, env)
+		if err != nil {
+			log.Warn().Err(err).Str("expr", node.Expr).Msg("expr eval failed")
 			return nil
 		}
-		styled := style.Apply(*value, node.Style)
-		return &styled
+		raw = result
+		hasValue = true
 	}
 
-	// DataSegment: resolve from segment values
-	value, ok := segmentValues[node.Type]
-	if !ok {
+	if !hasValue {
 		return nil
 	}
 
 	// Resolve format: config override > provider default > none
 	format := node.Format
-	if format == "" {
-		format = defaultFormats[node.Type]
+	if format == "" && node.Expr != "" {
+		format = defaultFormats[node.Expr]
 	}
 
-	text := FormatValue(value, format)
+	text := FormatValue(raw, format)
 	if text == "" {
 		return nil
 	}
@@ -129,8 +125,8 @@ func renderNode(
 		if c == nil {
 			return nil // compilation failed
 		}
-		env := condition.BuildSegmentEnv(conditionEnv, value, text)
-		if !c.Evaluate(env) {
+		segEnv := condition.BuildSegmentEnv(env, raw, text)
+		if !c.Evaluate(segEnv) {
 			return nil
 		}
 	}
@@ -140,18 +136,16 @@ func renderNode(
 }
 
 // Tree performs a depth-first traversal of the segment tree,
-// resolving each node against the registries and provider data.
+// resolving each node against the environment and default formats.
 func Tree(
 	tree []types.SegmentNode,
-	segments *segment.Registry,
 	session *types.SessionData,
-	segmentValues map[string]any,
+	env map[string]any,
 	defaultFormats map[string]string,
-	conditionEnv map[string]any,
 ) string {
 	var parts []string
 	for i := range tree {
-		rendered := renderNode(&tree[i], segments, session, segmentValues, defaultFormats, conditionEnv)
+		rendered := renderNode(&tree[i], session, env, defaultFormats)
 		if rendered != nil {
 			parts = append(parts, *rendered)
 		}
@@ -159,13 +153,14 @@ func Tree(
 	return strings.Join(parts, "")
 }
 
-// ResolveAll resolves all providers and returns merged segment values
-// and default formats.
-func ResolveAll(
+// BuildEnv resolves all providers concurrently and merges their nested
+// results into a single environment map. Returns the merged env and
+// flat default format map.
+func BuildEnv(
 	providers map[string]types.DataProvider,
 	session *types.SessionData,
-) (segmentValues map[string]any, defaultFormats map[string]string) {
-	segmentValues = make(map[string]any)
+) (env map[string]any, defaultFormats map[string]string) {
+	env = make(map[string]any)
 	defaultFormats = make(map[string]string)
 	var mu sync.Mutex
 	var wg sync.WaitGroup
@@ -181,7 +176,7 @@ func ResolveAll(
 			}
 			mu.Lock()
 			for k, v := range result.Values {
-				segmentValues[k] = v
+				env[k] = v
 			}
 			for k, v := range result.Formats {
 				defaultFormats[k] = v
@@ -191,5 +186,5 @@ func ResolveAll(
 	}
 
 	wg.Wait()
-	return segmentValues, defaultFormats
+	return env, defaultFormats
 }

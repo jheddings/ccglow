@@ -1,35 +1,35 @@
 {
   "segments": [
     {
-      "segment": "git.repo",
+      "expr": "git.repo",
       "style": { "color": "39" }
     },
     {
       "when": "git.repo == ''",
       "children": [
         {
-          "segment": "pwd.name",
+          "expr": "pwd.name",
           "style": { "color": "39" }
         }
       ]
     },
     {
-      "segment": "git.branch",
+      "expr": "git.branch",
       "when": "git.branch != '' && git.branch != 'main'",
       "style": { "color": "whiteBright", "bold": true, "prefix": " | " }
     },
     {
-      "segment": "git.modified",
+      "expr": "git.modified",
       "when": "value > 0",
       "style": { "color": "yellow", "prefix": " ~" }
     },
     {
-      "segment": "git.untracked",
+      "expr": "git.untracked",
       "when": "value > 0",
       "style": { "color": "cyan", "prefix": " ?" }
     },
     {
-      "segment": "context.percent.used",
+      "expr": "context.percent.used",
       "when": "context.percent.used >= 50",
       "style": { "color": "yellow", "prefix": " | " }
     }

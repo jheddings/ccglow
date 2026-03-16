@@ -1,7 +1,7 @@
 package condition
 
 import (
-	"strings"
+	"sync"
 
 	"github.com/expr-lang/expr"
 	"github.com/expr-lang/expr/vm"
@@ -11,6 +11,11 @@ import (
 type Condition struct {
 	program *vm.Program
 }
+
+var (
+	evalCache = make(map[string]*vm.Program)
+	evalMu    sync.Mutex
+)
 
 // Compile compiles an expression string into a reusable Condition.
 // Returns nil for empty expressions (always true).
@@ -44,42 +49,27 @@ func (c *Condition) Evaluate(env map[string]any) bool {
 	return ok && b
 }
 
-// BuildNestedEnv converts a flat segment values map into nested maps
-// for expr-lang member access. "git.repo" becomes env["git"]["repo"].
-func BuildNestedEnv(segmentValues map[string]any) map[string]any {
-	env := make(map[string]any)
-
-	for key, value := range segmentValues {
-		parts := strings.SplitN(key, ".", 2)
-		if len(parts) != 2 {
-			env[key] = value
-			continue
-		}
-
-		ns := parts[0]
-		field := parts[1]
-
-		sub, ok := env[ns].(map[string]any)
-		if !ok {
-			sub = make(map[string]any)
-			env[ns] = sub
-		}
-
-		// Handle dotted field names like "percent.used" -> nested further
-		fieldParts := strings.SplitN(field, ".", 2)
-		if len(fieldParts) == 2 {
-			inner, ok := sub[fieldParts[0]].(map[string]any)
-			if !ok {
-				inner = make(map[string]any)
-				sub[fieldParts[0]] = inner
-			}
-			inner[fieldParts[1]] = value
-		} else {
-			sub[field] = value
-		}
+// Eval compiles (with caching) and runs an expression against the environment,
+// returning the result as any value. Used to resolve expr fields in nodes.
+func Eval(expression string, env map[string]any) (any, error) {
+	if expression == "" {
+		return nil, nil
 	}
 
-	return env
+	evalMu.Lock()
+	program, ok := evalCache[expression]
+	if !ok {
+		var err error
+		program, err = expr.Compile(expression, expr.AllowUndefinedVariables())
+		if err != nil {
+			evalMu.Unlock()
+			return nil, err
+		}
+		evalCache[expression] = program
+	}
+	evalMu.Unlock()
+
+	return expr.Run(program, env)
 }
 
 // BuildSegmentEnv creates the evaluation environment for a single segment's

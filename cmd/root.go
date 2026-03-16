@@ -6,12 +6,10 @@ import (
 	"os"
 	"runtime/debug"
 
-	"github.com/jheddings/ccglow/internal/condition"
 	"github.com/jheddings/ccglow/internal/config"
 	"github.com/jheddings/ccglow/internal/preset"
 	"github.com/jheddings/ccglow/internal/provider"
 	"github.com/jheddings/ccglow/internal/render"
-	"github.com/jheddings/ccglow/internal/segment"
 	"github.com/jheddings/ccglow/internal/session"
 	"github.com/jheddings/ccglow/internal/style"
 	"github.com/jheddings/ccglow/internal/types"
@@ -121,21 +119,16 @@ func run(presetName, configPath, format, stdin string) string {
 	}
 	defer style.SetColorLevel(1)
 
-	segments := segment.NewRegistry()
-	segment.RegisterBuiltin(segments)
-
 	providers := provider.NewRegistry()
 	provider.RegisterBuiltin(providers)
 
 	tree := resolveTree(presetName, configPath)
 	log.Debug().Int("count", len(tree)).Msg("tree resolved")
 
-	segmentValues, defaultFormats := render.ResolveAll(providers.All(), sess)
-	log.Debug().Int("segments", len(segmentValues)).Msg("providers resolved")
+	env, defaultFormats := render.BuildEnv(providers.All(), sess)
+	log.Debug().Int("providers", len(env)).Msg("env built")
 
-	conditionEnv := condition.BuildNestedEnv(segmentValues)
-
-	output := render.Tree(tree, segments, sess, segmentValues, defaultFormats, conditionEnv)
+	output := render.Tree(tree, sess, env, defaultFormats)
 	log.Debug().Msg("render complete")
 
 	return output

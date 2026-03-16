@@ -60,37 +60,24 @@ type StyleAttrs struct {
 }
 
 // SegmentNode is a node in the render tree. Composite nodes have Children;
-// atomic nodes have a Type that maps to a Segment implementation.
+// atomic nodes have an Expr (evaluated against env) or a static Value.
 type SegmentNode struct {
-	Type     string         `json:"segment,omitempty"`
-	Provider string         `json:"provider,omitempty"` // kept for backward compat, ignored internally
-	Format   string         `json:"format,omitempty"`
-	When     string         `json:"when,omitempty"`
-	Enabled  *bool          `json:"enabled,omitempty"`
-	Style    *StyleAttrs    `json:"style,omitempty"`
-	Props    map[string]any `json:"props,omitempty"`
-	Children []SegmentNode  `json:"children,omitempty"`
+	Expr     string        `json:"expr,omitempty"`
+	Value    any           `json:"value,omitempty"`
+	Format   string        `json:"format,omitempty"`
+	When     string        `json:"when,omitempty"`
+	Enabled  *bool         `json:"enabled,omitempty"`
+	Style    *StyleAttrs   `json:"style,omitempty"`
+	Children []SegmentNode `json:"children,omitempty"`
 
 	// EnabledFn is set programmatically (presets) and takes precedence over Enabled.
 	EnabledFn func(*SessionData) bool `json:"-"`
 }
 
-// SegmentContext is passed to Segment.Render with resolved data.
-type SegmentContext struct {
-	Session *SessionData
-	Props   map[string]any
-}
-
-// Segment renders a single atomic value.
-type Segment interface {
-	Name() string
-	Render(ctx *SegmentContext) *string
-}
-
 // ProviderResult holds the values and optional default formats returned by a provider.
 type ProviderResult struct {
-	Values  map[string]any    // segment name -> raw value
-	Formats map[string]string // segment name -> default format (optional)
+	Values  map[string]any    // nested maps (e.g. {"git": {"branch": "main"}})
+	Formats map[string]string // flat dotted keys (e.g. "context.percent.used" -> "%d%%")
 }
 
 // DataProvider fetches external data and returns named segment values.

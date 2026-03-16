@@ -31,51 +31,6 @@ func TestCompile_Invalid(t *testing.T) {
 	}
 }
 
-func TestBuildNestedEnv(t *testing.T) {
-	values := map[string]any{
-		"git.branch":           "main",
-		"git.repo":             "ccglow",
-		"pwd.name":             "project",
-		"context.percent.used": 36,
-		"context.tokens":       "360K",
-	}
-	env := BuildNestedEnv(values)
-
-	git, ok := env["git"].(map[string]any)
-	if !ok {
-		t.Fatal("expected git namespace")
-	}
-	if git["branch"] != "main" {
-		t.Errorf("expected git.branch='main', got %v", git["branch"])
-	}
-	if git["repo"] != "ccglow" {
-		t.Errorf("expected git.repo='ccglow', got %v", git["repo"])
-	}
-
-	pwd, ok := env["pwd"].(map[string]any)
-	if !ok {
-		t.Fatal("expected pwd namespace")
-	}
-	if pwd["name"] != "project" {
-		t.Errorf("expected pwd.name='project', got %v", pwd["name"])
-	}
-
-	ctx, ok := env["context"].(map[string]any)
-	if !ok {
-		t.Fatal("expected context namespace")
-	}
-	pct, ok := ctx["percent"].(map[string]any)
-	if !ok {
-		t.Fatal("expected context.percent namespace")
-	}
-	if pct["used"] != 36 {
-		t.Errorf("expected context.percent.used=36, got %v", pct["used"])
-	}
-	if ctx["tokens"] != "360K" {
-		t.Errorf("expected context.tokens='360K', got %v", ctx["tokens"])
-	}
-}
-
 func TestBuildSegmentEnv(t *testing.T) {
 	nested := map[string]any{
 		"git": map[string]any{"branch": "main"},
@@ -116,10 +71,11 @@ func TestEvaluate_NumericComparisons(t *testing.T) {
 		{"context.percent.used != 36", false},
 	}
 
-	values := map[string]any{
-		"context.percent.used": 36,
+	nested := map[string]any{
+		"context": map[string]any{
+			"percent": map[string]any{"used": 36},
+		},
 	}
-	nested := BuildNestedEnv(values)
 
 	for _, tt := range tests {
 		c, err := Compile(tt.expr)
@@ -135,10 +91,9 @@ func TestEvaluate_NumericComparisons(t *testing.T) {
 }
 
 func TestEvaluate_StringComparisons(t *testing.T) {
-	values := map[string]any{
-		"git.branch": "main",
+	nested := map[string]any{
+		"git": map[string]any{"branch": "main"},
 	}
-	nested := BuildNestedEnv(values)
 
 	c, _ := Compile("git.branch == 'main'")
 	env := BuildSegmentEnv(nested, "main", "main")
@@ -146,8 +101,9 @@ func TestEvaluate_StringComparisons(t *testing.T) {
 		t.Error("expected true for git.branch == 'main'")
 	}
 
-	values["git.branch"] = "feat"
-	nested = BuildNestedEnv(values)
+	nested = map[string]any{
+		"git": map[string]any{"branch": "feat"},
+	}
 	env = BuildSegmentEnv(nested, "feat", "feat")
 	if c.Evaluate(env) {
 		t.Error("expected false for git.branch == 'main' when branch is 'feat'")
@@ -155,11 +111,12 @@ func TestEvaluate_StringComparisons(t *testing.T) {
 }
 
 func TestEvaluate_BooleanCombinators(t *testing.T) {
-	values := map[string]any{
-		"git.modified": 5,
-		"git.branch":   "test",
+	nested := map[string]any{
+		"git": map[string]any{
+			"modified": 5,
+			"branch":   "test",
+		},
 	}
-	nested := BuildNestedEnv(values)
 
 	c, _ := Compile("git.modified > 0 && git.branch != ''")
 	env := BuildSegmentEnv(nested, nil, "")
@@ -167,8 +124,12 @@ func TestEvaluate_BooleanCombinators(t *testing.T) {
 		t.Error("expected true for both conditions met")
 	}
 
-	values["git.modified"] = 0
-	nested = BuildNestedEnv(values)
+	nested = map[string]any{
+		"git": map[string]any{
+			"modified": 0,
+			"branch":   "test",
+		},
+	}
 	env = BuildSegmentEnv(nested, nil, "")
 	if c.Evaluate(env) {
 		t.Error("expected false when modified is 0")
@@ -176,11 +137,11 @@ func TestEvaluate_BooleanCombinators(t *testing.T) {
 }
 
 func TestEvaluate_ZeroValueDefaults(t *testing.T) {
-	// With no nil values, zeros are the defaults
-	values := map[string]any{
-		"context.percent.used": 0,
+	nested := map[string]any{
+		"context": map[string]any{
+			"percent": map[string]any{"used": 0},
+		},
 	}
-	nested := BuildNestedEnv(values)
 
 	c, _ := Compile("context.percent.used >= 50")
 	env := BuildSegmentEnv(nested, nil, "")
@@ -231,12 +192,10 @@ func TestEvaluate_NonBoolResult(t *testing.T) {
 }
 
 func TestEvaluate_CrossProviderReference(t *testing.T) {
-	// This is the #42 feature: pwd segment referencing git data
-	values := map[string]any{
-		"git.repo": "",
-		"pwd.name": "mydir",
+	nested := map[string]any{
+		"git": map[string]any{"repo": ""},
+		"pwd": map[string]any{"name": "mydir"},
 	}
-	nested := BuildNestedEnv(values)
 
 	c, err := Compile("git.repo == ''")
 	if err != nil {
@@ -247,11 +206,85 @@ func TestEvaluate_CrossProviderReference(t *testing.T) {
 		t.Error("expected true for git.repo == '' cross-provider reference")
 	}
 
-	// Now with a repo set
-	values["git.repo"] = "ccglow"
-	nested = BuildNestedEnv(values)
+	nested = map[string]any{
+		"git": map[string]any{"repo": "ccglow"},
+		"pwd": map[string]any{"name": "mydir"},
+	}
 	env = BuildSegmentEnv(nested, "mydir", "mydir")
 	if c.Evaluate(env) {
 		t.Error("expected false for git.repo == '' when repo is set")
+	}
+}
+
+func TestEval_Expression(t *testing.T) {
+	env := map[string]any{
+		"git": map[string]any{"branch": "main"},
+	}
+
+	result, err := Eval("git.branch", env)
+	if err != nil {
+		t.Fatalf("Eval error: %v", err)
+	}
+	if result != "main" {
+		t.Errorf("expected 'main', got %v", result)
+	}
+}
+
+func TestEval_Arithmetic(t *testing.T) {
+	env := map[string]any{
+		"git": map[string]any{"insertions": 10, "deletions": 5},
+	}
+
+	result, err := Eval("git.insertions + git.deletions", env)
+	if err != nil {
+		t.Fatalf("Eval error: %v", err)
+	}
+	if result != 15 {
+		t.Errorf("expected 15, got %v", result)
+	}
+}
+
+func TestEval_Empty(t *testing.T) {
+	result, err := Eval("", map[string]any{})
+	if err != nil {
+		t.Fatalf("Eval error: %v", err)
+	}
+	if result != nil {
+		t.Errorf("expected nil, got %v", result)
+	}
+}
+
+func TestEval_Invalid(t *testing.T) {
+	_, err := Eval(">>>bad<<<", map[string]any{})
+	if err == nil {
+		t.Error("expected error for invalid expression")
+	}
+}
+
+func TestEval_Cached(t *testing.T) {
+	env := map[string]any{"x": 1}
+	r1, _ := Eval("x + 1", env)
+	r2, _ := Eval("x + 1", env)
+	if r1 != r2 {
+		t.Error("cached results should match")
+	}
+}
+
+func TestEval_UndefinedVariable(t *testing.T) {
+	// Accessing a field on a nil namespace errors in expr-lang;
+	// the renderer handles this gracefully by skipping the node.
+	_, err := Eval("missing.field", map[string]any{})
+	if err == nil {
+		t.Error("expected error for undefined variable field access")
+	}
+}
+
+func TestEval_UndefinedTopLevel(t *testing.T) {
+	result, err := Eval("missing", map[string]any{})
+	if err != nil {
+		t.Fatalf("Eval error: %v", err)
+	}
+	if result != nil {
+		t.Errorf("expected nil for undefined top-level variable, got %v", result)
 	}
 }

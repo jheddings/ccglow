@@ -7,17 +7,17 @@ type claudeProvider struct{}
 func (p *claudeProvider) Name() string { return "claude" }
 
 func (p *claudeProvider) Resolve(session *types.SessionData) (*types.ProviderResult, error) {
-	result := &types.ProviderResult{
-		Values: map[string]any{
-			"claude.version": "",
-			"claude.style":   "",
-		},
+	claude := map[string]any{
+		"version": "",
+		"style":   "",
 	}
 	if session.Version != "" {
-		result.Values["claude.version"] = session.Version
+		claude["version"] = session.Version
 	}
 	if session.OutputStyle != nil && session.OutputStyle.Name != "" {
-		result.Values["claude.style"] = session.OutputStyle.Name
+		claude["style"] = session.OutputStyle.Name
 	}
-	return result, nil
+	return &types.ProviderResult{
+		Values: map[string]any{"claude": claude},
+	}, nil
 }

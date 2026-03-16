@@ -1,29 +1,29 @@
 # Conditional Visibility (`when`)
 
-Segments can show or hide based on data. Add a `when` expression to any
-segment node — if it evaluates to `true`, the segment renders; if `false`, it
+Nodes can show or hide based on data. Add a `when` expression to any
+node — if it evaluates to `true`, the node renders; if `false`, it
 collapses as if it had no data.
 
 ```json
 {
-  "segment": "context.percent.used",
+  "expr": "context.percent.used",
   "when": "context.percent.used >= 50",
   "style": { "color": "yellow" }
 }
 ```
 
 This only shows the context percentage when usage hits 50% or higher. Below
-that, the segment disappears from the statusline.
+that, the node disappears from the statusline.
 
 ## Field References
 
 Expressions can reference three kinds of values:
 
-### `provider.field` — Segment values
+### `provider.field` — Provider values
 
-Use the full segment name to access any provider's data. All provider data
+Use the full dotted name to access any provider's data. All provider data
 is available in every expression — you can reference fields from any provider,
-not just the one that owns the current segment.
+not just the one that owns the current node.
 
 | Provider | Available Fields                                                                                                                        |
 | -------- | --------------------------------------------------------------------------------------------------------------------------------------- |
@@ -38,19 +38,19 @@ not just the one that owns the current segment.
 
 ### `value` — Raw data value
 
-The raw value from the segment this node maps to. The type matches the
+The raw value from the expression this node evaluates. The type matches the
 provider field — `int` for counts, `string` for text, etc.
 
 ```json
-{ "segment": "git.modified", "when": "value > 0" }
+{ "expr": "git.modified", "when": "value > 0" }
 ```
 
 ### `text` — Formatted display text
 
-The formatted but unstyled text the segment would display. Always a string.
+The formatted but unstyled text the node would display. Always a string.
 
 ```json
-{ "segment": "cost.usd", "when": "text != ''" }
+{ "expr": "cost.usd", "when": "text != ''" }
 ```
 
 ## Operators
@@ -106,7 +106,7 @@ data is unavailable, providers return typed zero values:
 
 This means you don't need nil guards. `context.percent.used >= 50` just
 works — if there's no context data, the value is `0`, the comparison is
-`0 >= 50` → `false`, and the segment hides.
+`0 >= 50` → `false`, and the node hides.
 
 ## Groups and Composites
 
@@ -117,8 +117,8 @@ every expression, so you can gate groups on any condition:
 {
   "when": "git.repo != ''",
   "children": [
-    { "segment": "git.owner", "style": { "color": "240" } },
-    { "segment": "git.repo", "style": { "color": "39", "prefix": "/" } }
+    { "expr": "git.owner", "style": { "color": "240" } },
+    { "expr": "git.repo", "style": { "color": "39", "prefix": "/" } }
   ]
 }
 ```
@@ -132,13 +132,13 @@ This is useful for "show one thing or another" patterns:
 {
   "when": "git.repo != ''",
   "children": [
-    { "segment": "git.repo", "style": { "color": "39" } }
+    { "expr": "git.repo", "style": { "color": "39" } }
   ]
 },
 {
   "when": "git.repo == ''",
   "children": [
-    { "segment": "pwd.name", "style": { "color": "39" } }
+    { "expr": "pwd.name", "style": { "color": "39" } }
   ]
 }
 ```
@@ -153,18 +153,18 @@ that reference any combination of providers:
 
 ```json
 {
-  "segment": "pwd.name",
+  "expr": "pwd.name",
   "when": "git.repo == ''",
   "style": { "color": "39" }
 }
 ```
 
 This shows the directory name only when there's no git repo — a `pwd`
-segment gated on `git` data.
+expression gated on `git` data.
 
 ```json
 {
-  "segment": "context.percent.used",
+  "expr": "context.percent.used",
   "when": "context.percent.used >= 50 && model.name != ''",
   "style": { "color": "yellow" }
 }
@@ -177,30 +177,30 @@ Show context usage only when it's high AND we have model info available.
 **Show branch only when not on main:**
 
 ```json
-{ "segment": "git.branch", "when": "git.branch != '' && git.branch != 'main'" }
+{ "expr": "git.branch", "when": "git.branch != '' && git.branch != 'main'" }
 ```
 
 **Show dirty indicators only when non-zero:**
 
 ```json
-{ "segment": "git.modified", "when": "value > 0", "style": { "prefix": " ~" } }
-{ "segment": "git.untracked", "when": "value > 0", "style": { "prefix": " ?" } }
+{ "expr": "git.modified", "when": "value > 0", "style": { "prefix": " ~" } }
+{ "expr": "git.untracked", "when": "value > 0", "style": { "prefix": " ?" } }
 ```
 
 **Context warning at high usage:**
 
 ```json
-{ "segment": "context.percent.used", "when": "context.percent.used >= 80", "style": { "color": "red" } }
-{ "segment": "context.percent.used", "when": "context.percent.used >= 50 && context.percent.used < 80", "style": { "color": "yellow" } }
+{ "expr": "context.percent.used", "when": "context.percent.used >= 80", "style": { "color": "red" } }
+{ "expr": "context.percent.used", "when": "context.percent.used >= 50 && context.percent.used < 80", "style": { "color": "yellow" } }
 ```
 
-Two copies of the same segment with mutually exclusive conditions — red
+Two copies of the same expression with mutually exclusive conditions — red
 above 80%, yellow between 50-80%, hidden below 50%.
 
 **Show speed only when available:**
 
 ```json
-{ "segment": "speed.output", "when": "text != ''" }
+{ "expr": "speed.output", "when": "text != ''" }
 ```
 
 For more on available segments, see [SEGMENTS.md](SEGMENTS.md).
