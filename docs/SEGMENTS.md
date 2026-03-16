@@ -160,7 +160,11 @@ output. Use composites for sections that should appear or disappear together.
   "style": { "prefix": " | " },
   "children": [
     { "segment": "git.branch", "style": { "bold": true } },
-    { "segment": "git.insertions", "when": "value > 0", "style": { "color": "green", "prefix": " +" } },
+    {
+      "segment": "git.insertions",
+      "when": "value > 0",
+      "style": { "color": "green", "prefix": " +" }
+    },
     { "segment": "git.deletions", "when": "value > 0", "style": { "color": "red", "prefix": " -" } }
   ]
 }

@@ -25,16 +25,16 @@ Use the full segment name to access any provider's data. All provider data
 is available in every expression — you can reference fields from any provider,
 not just the one that owns the current segment.
 
-| Provider | Available Fields                                                                                                            |
-| -------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Provider | Available Fields                                                                                                                        |
+| -------- | --------------------------------------------------------------------------------------------------------------------------------------- |
 | git      | `git.branch`, `git.insertions`, `git.deletions`, `git.modified`, `git.staged`, `git.untracked`, `git.owner`, `git.repo`, `git.worktree` |
-| context  | `context.tokens`, `context.size`, `context.percent.used`, `context.percent.remaining`, `context.input`, `context.output`    |
-| model    | `model.name`, `model.id`                                                                                                    |
-| cost     | `cost.usd`                                                                                                                  |
-| speed    | `speed.input`, `speed.output`, `speed.total`                                                                                |
-| session  | `session.duration.total`, `session.duration.api`, `session.lines-added`, `session.lines-removed`, `session.id`              |
-| pwd      | `pwd.name`, `pwd.path`, `pwd.smart`                                                                                        |
-| claude   | `claude.version`, `claude.style`                                                                                            |
+| context  | `context.tokens`, `context.size`, `context.percent.used`, `context.percent.remaining`, `context.input`, `context.output`                |
+| model    | `model.name`, `model.id`                                                                                                                |
+| cost     | `cost.usd`                                                                                                                              |
+| speed    | `speed.input`, `speed.output`, `speed.total`                                                                                            |
+| session  | `session.duration.total`, `session.duration.api`, `session.lines-added`, `session.lines-removed`, `session.id`                          |
+| pwd      | `pwd.name`, `pwd.path`, `pwd.smart`                                                                                                     |
+| claude   | `claude.version`, `claude.style`                                                                                                        |
 
 ### `value` — Raw data value
 

@@ -33,11 +33,11 @@ func TestCompile_Invalid(t *testing.T) {
 
 func TestBuildNestedEnv(t *testing.T) {
 	values := map[string]any{
-		"git.branch":            "main",
-		"git.repo":              "ccglow",
-		"pwd.name":              "project",
-		"context.percent.used":  36,
-		"context.tokens":        "360K",
+		"git.branch":           "main",
+		"git.repo":             "ccglow",
+		"pwd.name":             "project",
+		"context.percent.used": 36,
+		"context.tokens":       "360K",
 	}
 	env := BuildNestedEnv(values)
 
