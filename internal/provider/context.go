@@ -10,8 +10,8 @@ import (
 type ContextData struct {
 	Tokens    string `segment:"context.tokens"`
 	Size      string `segment:"context.size"`
-	Percent   *int   `segment:"context.percent,format:%d%%"`
-	Remaining *int   `segment:"context.remaining,format:%d%%"`
+	Percent   *int   `segment:"context.percent.used,format:%d%%"`
+	Remaining *int   `segment:"context.percent.remaining,format:%d%%"`
 	Input     string `segment:"context.input"`
 	Output    string `segment:"context.output"`
 }
