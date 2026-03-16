@@ -37,7 +37,11 @@ func getCondition(expr string) *condition.Condition {
 
 func isEnabled(node *types.SegmentNode, session *types.SessionData) bool {
 	if node.EnabledFn != nil {
-		defer func() { recover() }()
+		defer func() {
+			if r := recover(); r != nil {
+				log.Warn().Str("type", node.Type).Interface("panic", r).Msg("enabledFn panicked")
+			}
+		}()
 		return node.EnabledFn(session)
 	}
 	if node.Enabled != nil {
@@ -204,6 +208,7 @@ func ResolveProviders(
 	for name := range names {
 		p, ok := providers[name]
 		if !ok {
+			log.Warn().Str("provider", name).Msg("provider not registered")
 			continue
 		}
 		wg.Add(1)
@@ -211,6 +216,7 @@ func ResolveProviders(
 			defer wg.Done()
 			data, err := prov.Resolve(session)
 			if err != nil {
+				log.Warn().Err(err).Str("provider", prov.Name()).Msg("provider resolve failed")
 				return
 			}
 			mu.Lock()

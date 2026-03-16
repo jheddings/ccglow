@@ -108,9 +108,10 @@ func Version() string {
 func run(presetName, configPath, format, stdin string) string {
 	sess := session.Parse(stdin)
 	if sess == nil {
+		log.Warn().Msg("failed to parse session")
 		return ""
 	}
-	log.Debug().Msg("session parsed")
+	log.Debug().Str("cwd", sess.CWD).Msg("session parsed")
 
 	if format == "plain" {
 		style.SetColorLevel(0)
@@ -132,7 +133,7 @@ func run(presetName, configPath, format, stdin string) string {
 	}
 
 	tree := resolveTree(presetName, configPath)
-	log.Debug().Int("nodes", len(tree)).Msg("tree resolved")
+	log.Debug().Int("count", len(tree)).Msg("tree resolved")
 
 	providerNames := render.CollectProviderNames(tree, tagIdx)
 	log.Debug().Int("count", len(providerNames)).Msg("providers collected")
@@ -152,13 +153,15 @@ func resolveTree(presetName, configPath string) []types.SegmentNode {
 		if err != nil {
 			log.Error().Err(err).Str("path", configPath).Msg("failed to load config")
 		} else {
-			log.Debug().Int("bytes", len(data)).Str("path", configPath).Msg("config file loaded")
+			log.Debug().Int("bytes", len(data)).Str("path", configPath).Msg("config file read")
 			tree, err := config.Parse(data)
 			if err != nil {
-				log.Error().Err(err).Msg("failed to parse config")
+				log.Error().Err(err).Str("path", configPath).Msg("failed to parse config")
 			} else if len(tree) > 0 {
-				log.Debug().Int("nodes", len(tree)).Msg("config parsed")
+				log.Debug().Int("count", len(tree)).Str("path", configPath).Msg("config tree parsed")
 				return tree
+			} else {
+				log.Warn().Str("path", configPath).Msg("config file produced empty tree")
 			}
 		}
 	}
