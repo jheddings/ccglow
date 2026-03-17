@@ -1,4 +1,4 @@
-package condition
+package eval
 
 import (
 	"testing"
@@ -28,6 +28,27 @@ func TestCompile_Invalid(t *testing.T) {
 	_, err := Compile(">>>invalid<<<")
 	if err == nil {
 		t.Fatal("expected error for invalid expression")
+	}
+}
+
+func TestCompileCached_Valid(t *testing.T) {
+	c := CompileCached("git.branch != ''")
+	if c == nil {
+		t.Fatal("expected non-nil Condition")
+	}
+}
+
+func TestCompileCached_Empty(t *testing.T) {
+	c := CompileCached("")
+	if c != nil {
+		t.Fatal("expected nil for empty expression")
+	}
+}
+
+func TestCompileCached_Invalid(t *testing.T) {
+	c := CompileCached(">>>bad<<<")
+	if c != nil {
+		t.Fatal("expected nil for invalid expression")
 	}
 }
 
@@ -271,8 +292,6 @@ func TestEval_Cached(t *testing.T) {
 }
 
 func TestEval_UndefinedVariable(t *testing.T) {
-	// Accessing a field on a nil namespace errors in expr-lang;
-	// the renderer handles this gracefully by skipping the node.
 	_, err := Eval("missing.field", map[string]any{})
 	if err == nil {
 		t.Error("expected error for undefined variable field access")

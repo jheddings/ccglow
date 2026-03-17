@@ -1,21 +1,40 @@
-package condition
+package eval
 
 import (
 	"sync"
 
 	"github.com/expr-lang/expr"
 	"github.com/expr-lang/expr/vm"
+	"github.com/rs/zerolog/log"
 )
 
-// Condition is a compiled when expression.
+// Condition is a compiled boolean expression (used for when guards).
 type Condition struct {
 	program *vm.Program
 }
 
 var (
-	evalCache = make(map[string]*vm.Program)
-	evalMu    sync.Mutex
+	cache   = make(map[string]*vm.Program)
+	cacheMu sync.Mutex
 )
+
+// compile returns a cached compiled program, or compiles and caches it.
+func compile(expression string) (*vm.Program, error) {
+	cacheMu.Lock()
+	defer cacheMu.Unlock()
+
+	if p, ok := cache[expression]; ok {
+		return p, nil
+	}
+
+	p, err := expr.Compile(expression, expr.AllowUndefinedVariables())
+	if err != nil {
+		return nil, err
+	}
+
+	cache[expression] = p
+	return p, nil
+}
 
 // Compile compiles an expression string into a reusable Condition.
 // Returns nil for empty expressions (always true).
@@ -24,12 +43,27 @@ func Compile(expression string) (*Condition, error) {
 		return nil, nil
 	}
 
-	program, err := expr.Compile(expression, expr.AllowUndefinedVariables())
+	p, err := compile(expression)
 	if err != nil {
 		return nil, err
 	}
 
-	return &Condition{program: program}, nil
+	return &Condition{program: p}, nil
+}
+
+// CompileCached compiles a when expression with caching and warning on failure.
+// Returns nil for empty or invalid expressions.
+func CompileCached(expression string) *Condition {
+	if expression == "" {
+		return nil
+	}
+
+	c, err := Compile(expression)
+	if err != nil {
+		log.Warn().Err(err).Str("expr", expression).Msg("invalid when expression")
+		return nil
+	}
+	return c
 }
 
 // Evaluate runs the compiled expression against the environment.
@@ -56,20 +90,12 @@ func Eval(expression string, env map[string]any) (any, error) {
 		return nil, nil
 	}
 
-	evalMu.Lock()
-	program, ok := evalCache[expression]
-	if !ok {
-		var err error
-		program, err = expr.Compile(expression, expr.AllowUndefinedVariables())
-		if err != nil {
-			evalMu.Unlock()
-			return nil, err
-		}
-		evalCache[expression] = program
+	p, err := compile(expression)
+	if err != nil {
+		return nil, err
 	}
-	evalMu.Unlock()
 
-	return expr.Run(program, env)
+	return expr.Run(p, env)
 }
 
 // BuildSegmentEnv creates the evaluation environment for a single segment's

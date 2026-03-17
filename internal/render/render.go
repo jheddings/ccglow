@@ -4,35 +4,11 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/jheddings/ccglow/internal/condition"
+	"github.com/jheddings/ccglow/internal/eval"
 	"github.com/jheddings/ccglow/internal/style"
 	"github.com/jheddings/ccglow/internal/types"
 	"github.com/rs/zerolog/log"
 )
-
-var conditionCache = make(map[string]*condition.Condition)
-var conditionMu sync.Mutex
-
-func getCondition(expr string) *condition.Condition {
-	if expr == "" {
-		return nil
-	}
-	conditionMu.Lock()
-	defer conditionMu.Unlock()
-
-	if c, ok := conditionCache[expr]; ok {
-		return c
-	}
-
-	c, err := condition.Compile(expr)
-	if err != nil {
-		log.Warn().Err(err).Str("expr", expr).Msg("invalid when expression")
-		conditionCache[expr] = nil
-		return nil
-	}
-	conditionCache[expr] = c
-	return c
-}
 
 func isEnabled(node *types.SegmentNode, session *types.SessionData) bool {
 	if node.EnabledFn != nil {
@@ -62,11 +38,11 @@ func renderNode(
 	// Composite: evaluate when, then render children
 	if len(node.Children) > 0 {
 		if node.When != "" {
-			c := getCondition(node.When)
+			c := eval.CompileCached(node.When)
 			if c == nil {
 				return nil // compilation failed
 			}
-			segEnv := condition.BuildSegmentEnv(env, nil, "")
+			segEnv := eval.BuildSegmentEnv(env, nil, "")
 			if !c.Evaluate(segEnv) {
 				return nil
 			}
@@ -95,7 +71,7 @@ func renderNode(
 		raw = node.Value
 		hasValue = true
 	} else if node.Expr != "" {
-		result, err := condition.Eval(node.Expr, env)
+		result, err := eval.Eval(node.Expr, env)
 		if err != nil {
 			log.Warn().Err(err).Str("expr", node.Expr).Msg("expr eval failed")
 			return nil
@@ -121,11 +97,11 @@ func renderNode(
 
 	// Evaluate when expression
 	if node.When != "" {
-		c := getCondition(node.When)
+		c := eval.CompileCached(node.When)
 		if c == nil {
 			return nil // compilation failed
 		}
-		segEnv := condition.BuildSegmentEnv(env, raw, text)
+		segEnv := eval.BuildSegmentEnv(env, raw, text)
 		if !c.Evaluate(segEnv) {
 			return nil
 		}

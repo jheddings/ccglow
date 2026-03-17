@@ -15,7 +15,7 @@ read stdin → resolve providers into env → depth-first render → styled outp
 - `expr` nodes — evaluate an expression against the provider env (e.g. `git.branch`)
 - `value` nodes — render static text (literals, separators, newlines)
 - `Provider` — data fetcher returning nested maps (e.g. `{"git": {"branch": "main"}}`)
-- `condition.Eval()` — cached expr-lang evaluation for both `expr` fields and `when` conditions
+- `eval.Eval()` — cached expr-lang evaluation for both `expr` fields and `when` conditions
 - Presets — JSON files loaded via `embed.FS`
 
 ## First Principles
@@ -28,7 +28,7 @@ read stdin → resolve providers into env → depth-first render → styled outp
 - `internal/types/` — shared types (`SegmentNode`, `Style`, `ProviderResult`)
 - `internal/session/` — stdin JSON parsing
 - `internal/config/` — JSON config file parsing
-- `internal/condition/` — expr-lang compilation, caching, evaluation
+- `internal/eval/` — expr-lang compilation, caching, evaluation
 - `internal/provider/` — provider registry and implementations
 - `internal/render/` — tree traversal, env building, output
 - `internal/style/` — ANSI styling, color level control
