@@ -42,11 +42,12 @@ That's it. One binary, no runtime dependencies, no config files required.
 
 ## 🎨 Presets
 
-Five built-in layouts, from minimal to maximal.
+Six built-in layouts, from minimal to maximal.
 
 | Preset                                        | Description                                            | Prerequisites                                               |
 | --------------------------------------------- | ------------------------------------------------------ | ----------------------------------------------------------- |
-| [**default**](internal/preset/default.json)   | The essentials: path, branch, diffs, context, duration | None                                                        |
+| [**default**](internal/preset/default.json)   | Conditional essentials — segments appear when relevant | None                                                        |
+| [**glow**](internal/preset/glow.json)         | Same as default with Nerd Font glyphs                  | [Nerd Font](https://www.nerdfonts.com/)                     |
 | [**minimal**](internal/preset/minimal.json)   | Smart and quiet — shows data only when it matters      | None                                                        |
 | [**full**](internal/preset/full.json)         | Everything, all at once                                | None                                                        |
 | [**f1**](internal/preset/f1.json)             | Multi-line, powerline-styled, truecolor                | [Nerd Font](https://www.nerdfonts.com/), truecolor terminal |
@@ -110,7 +111,7 @@ For the full reference:
 Usage: ccglow [flags]
 
 Flags:
-  --preset <name>     Use a named preset (default, minimal, full, f1, moonwalk)
+  --preset <name>     Use a named preset (default, glow, minimal, full, f1, moonwalk)
   --config <path>     Load JSON config file
   --format <type>     Output format: ansi (default), plain
   --tee <path>        Write raw stdin JSON to file before processing
