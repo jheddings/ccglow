@@ -14,6 +14,10 @@ setup:
 build:
 	go build -o dist/{{binary}} .
 
+# install the current version of the app
+install:
+	go install .
+
 # run tests
 test:
 	go test ./...
