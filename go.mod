@@ -4,7 +4,7 @@ go 1.26.1
 
 require (
 	github.com/expr-lang/expr v1.17.8
-	github.com/rs/zerolog v1.34.0
+	github.com/rs/zerolog v1.35.0
 	github.com/spf13/cobra v1.10.2
 	golang.org/x/sys v0.42.0
 )
