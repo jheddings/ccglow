@@ -49,6 +49,7 @@ return their zero values (`""` for strings, `0` for integers).
 | `context.percent.remaining` | Remaining capacity as percentage     | `64%`          |
 | `context.input`             | Total input tokens, human-formatted  | `162K`         |
 | `context.output`            | Total output tokens, human-formatted | `45K`          |
+| `context.bar`               | Visual progress bar (10 chars wide)  | `███░░░░░░░`   |
 
 Token formatting scales automatically: raw count below 1K, `nK` for thousands,
 `n.nM` for millions.

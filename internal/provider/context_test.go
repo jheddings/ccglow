@@ -168,6 +168,48 @@ func TestContextProviderNoRemaining(t *testing.T) {
 	}
 }
 
+func TestContextProviderBar(t *testing.T) {
+	p := &contextProvider{}
+	tests := []struct {
+		pct  int
+		want string
+	}{
+		{0, "░░░░░░░░░░"},
+		{36, "███░░░░░░░"},
+		{50, "█████░░░░░"},
+		{100, "██████████"},
+	}
+	for _, tt := range tests {
+		sess := &types.SessionData{
+			CWD: "/tmp",
+			ContextWindow: &types.ContextWindow{
+				UsedPercentage: tt.pct,
+				CurrentUsage:   &types.CurrentUsage{InputTokens: 1},
+			},
+		}
+		result, err := p.Resolve(sess)
+		if err != nil {
+			t.Fatal(err)
+		}
+		got := contextValues(result)["bar"]
+		if got != tt.want {
+			t.Errorf("bar at %d%% = %q, want %q", tt.pct, got, tt.want)
+		}
+	}
+}
+
+func TestContextProviderBarEmpty(t *testing.T) {
+	p := &contextProvider{}
+	sess := &types.SessionData{CWD: "/tmp"}
+	result, err := p.Resolve(sess)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := contextValues(result)["bar"]; got != "░░░░░░░░░░" {
+		t.Errorf("empty session bar = %q, want all empty", got)
+	}
+}
+
 func TestContextProviderZeroRemaining(t *testing.T) {
 	p := &contextProvider{}
 	sess := &types.SessionData{
