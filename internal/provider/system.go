@@ -37,12 +37,12 @@ func (p *systemProvider) Resolve(session *types.SessionData) (*types.ProviderRes
 	result := &types.ProviderResult{
 		Values: map[string]any{"system": sys},
 		Formats: map[string]string{
-			"system.load.avg1":        "%.2f",
-			"system.load.avg5":        "%.2f",
-			"system.load.avg15":       "%.2f",
-			"system.mem.percent":      "%d%%",
-			"system.disk.percent":     "%d%%",
-			"system.battery.percent":  "%d%%",
+			"system.load.avg1":       "%.2f",
+			"system.load.avg5":       "%.2f",
+			"system.load.avg15":      "%.2f",
+			"system.mem.percent":     "%d%%",
+			"system.disk.percent":    "%d%%",
+			"system.battery.percent": "%d%%",
 		},
 	}
 

@@ -107,20 +107,20 @@ The `_min` variants are raw integers suitable for `when` conditions
 
 ## System — `system`
 
-| Segment                  | Description                          | Example Output     |
-| ------------------------ | ------------------------------------ | ------------------ |
-| `system.load.avg1`       | 1-minute load average (format %.2f)  | `1.42`             |
-| `system.load.avg5`       | 5-minute load average (format %.2f)  | `2.10`             |
-| `system.load.avg15`      | 15-minute load average (format %.2f) | `1.87`             |
-| `system.mem.used`        | Used memory, human-formatted         | `12.4G`            |
-| `system.mem.total`       | Total memory, human-formatted        | `32G`              |
-| `system.mem.percent`     | Memory usage percentage              | `39%`              |
-| `system.disk.used`       | Used disk space, human-formatted     | `234G`             |
-| `system.disk.total`      | Total disk space, human-formatted    | `1T`               |
-| `system.disk.percent`    | Disk usage percentage                | `23%`              |
-| `system.battery.percent` | Battery charge percentage            | `85%`              |
-| `system.battery.state`   | Battery state                        | `charging`         |
-| `system.uptime`          | System uptime, human-formatted       | `3d 14h`, `2h 5m`  |
+| Segment                  | Description                          | Example Output    |
+| ------------------------ | ------------------------------------ | ----------------- |
+| `system.load.avg1`       | 1-minute load average (format %.2f)  | `1.42`            |
+| `system.load.avg5`       | 5-minute load average (format %.2f)  | `2.10`            |
+| `system.load.avg15`      | 15-minute load average (format %.2f) | `1.87`            |
+| `system.mem.used`        | Used memory, human-formatted         | `12.4G`           |
+| `system.mem.total`       | Total memory, human-formatted        | `32G`             |
+| `system.mem.percent`     | Memory usage percentage              | `39%`             |
+| `system.disk.used`       | Used disk space, human-formatted     | `234G`            |
+| `system.disk.total`      | Total disk space, human-formatted    | `1T`              |
+| `system.disk.percent`    | Disk usage percentage                | `23%`             |
+| `system.battery.percent` | Battery charge percentage            | `85%`             |
+| `system.battery.state`   | Battery state                        | `charging`        |
+| `system.uptime`          | System uptime, human-formatted       | `3d 14h`, `2h 5m` |
 
 Disk usage is measured at the mount point of the current working directory.
 Battery segments return zero values on machines without a battery.
@@ -167,7 +167,10 @@ string. Variables are replaced before execution. Unresolved references become
 empty strings.
 
 ```json
-{ "command": "gh pr list --repo ${git.owner}/${git.repo} --json number --jq length", "when": "text != '' && text != '0'" }
+{
+  "command": "gh pr list --repo ${git.owner}/${git.repo} --json number --jq length",
+  "when": "text != '' && text != '0'"
+}
 ```
 
 #### Behavior
@@ -187,11 +190,7 @@ right-alignment: put some segments to the left, a `flex`, then the segments
 you want on the right.
 
 ```json
-{ "segments": [
-  { "expr": "pwd.name" },
-  { "flex": true },
-  { "expr": "context.percent.used" }
-] }
+{ "segments": [{ "expr": "pwd.name" }, { "flex": true }, { "expr": "context.percent.used" }] }
 ```
 
 - Top-level only. A `flex` nested inside a `children` group is ignored.

@@ -25,16 +25,16 @@ Use the full dotted name to access any provider's data. All provider data
 is available in every expression — you can reference fields from any provider,
 not just the one that owns the current node.
 
-| Provider | Available Fields                                                                                                                                              |
-| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| git      | `git.branch`, `git.insertions`, `git.deletions`, `git.modified`, `git.staged`, `git.untracked`, `git.owner`, `git.repo`, `git.worktree`                      |
-| context  | `context.tokens`, `context.size`, `context.percent.used`, `context.percent.remaining`, `context.input`, `context.output`, `context.bar`                                 |
-| model    | `model.name`, `model.id`                                                                                                                                      |
-| cost     | `cost.usd`, `cost.total`                                                                                                                                      |
-| speed    | `speed.input`, `speed.output`, `speed.total`                                                                                                                  |
-| session  | `session.duration.total`, `session.duration.api`, `session.duration.total_min`, `session.duration.api_min`, `session.lines-added`, `session.lines-removed`, `session.id`, `session.name` |
-| pwd      | `pwd.name`, `pwd.path`, `pwd.smart`                                                                                                                           |
-| claude   | `claude.version`, `claude.style`                                                                                                                               |
+| Provider | Available Fields                                                                                                                                                                                                                                            |
+| -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| git      | `git.branch`, `git.insertions`, `git.deletions`, `git.modified`, `git.staged`, `git.untracked`, `git.owner`, `git.repo`, `git.worktree`                                                                                                                     |
+| context  | `context.tokens`, `context.size`, `context.percent.used`, `context.percent.remaining`, `context.input`, `context.output`, `context.bar`                                                                                                                     |
+| model    | `model.name`, `model.id`                                                                                                                                                                                                                                    |
+| cost     | `cost.usd`, `cost.total`                                                                                                                                                                                                                                    |
+| speed    | `speed.input`, `speed.output`, `speed.total`                                                                                                                                                                                                                |
+| session  | `session.duration.total`, `session.duration.api`, `session.duration.total_min`, `session.duration.api_min`, `session.lines-added`, `session.lines-removed`, `session.id`, `session.name`                                                                    |
+| pwd      | `pwd.name`, `pwd.path`, `pwd.smart`                                                                                                                                                                                                                         |
+| claude   | `claude.version`, `claude.style`                                                                                                                                                                                                                            |
 | system   | `system.load.avg1`, `system.load.avg5`, `system.load.avg15`, `system.mem.used`, `system.mem.total`, `system.mem.percent`, `system.disk.used`, `system.disk.total`, `system.disk.percent`, `system.battery.percent`, `system.battery.state`, `system.uptime` |
 
 ### `value` — Raw data value

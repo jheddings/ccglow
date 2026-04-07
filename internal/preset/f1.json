@@ -83,7 +83,13 @@
     },
     {
       "expr": "speed.output",
-      "style": { "color": "#50FA7B", "bgcolor": "#2E1A47", "bold": true, "prefix": " \uf0e7 ", "suffix": " " }
+      "style": {
+        "color": "#50FA7B",
+        "bgcolor": "#2E1A47",
+        "bold": true,
+        "prefix": " \uf0e7 ",
+        "suffix": " "
+      }
     },
     {
       "value": "\ue0b0",

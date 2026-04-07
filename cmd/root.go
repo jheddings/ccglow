@@ -23,8 +23,8 @@ var (
 	presetName string
 	configPath string
 	format     string
-	tee     string
-	dump    string
+	tee        string
+	dump       string
 	logPath    string
 	verbose    bool
 )
