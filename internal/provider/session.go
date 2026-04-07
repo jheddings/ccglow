@@ -1,7 +1,10 @@
 package provider
 
 import (
+	"bufio"
+	"encoding/json"
 	"fmt"
+	"os"
 
 	"github.com/jheddings/ccglow/internal/types"
 )
@@ -21,6 +24,7 @@ func (p *sessionProvider) Resolve(session *types.SessionData) (*types.ProviderRe
 		"lines-added":   0,
 		"lines-removed": 0,
 		"id":            "",
+		"name":          readSessionName(session.TranscriptPath),
 	}
 
 	result := &types.ProviderResult{
@@ -49,6 +53,43 @@ func (p *sessionProvider) Resolve(session *types.SessionData) (*types.ProviderRe
 	}
 
 	return result, nil
+}
+
+// readSessionName scans a Claude Code transcript JSONL file for the most
+// recent custom-title entry (set via /rename) and returns its title. Returns
+// empty string when the file is missing, unreadable, or has no title.
+func readSessionName(path string) string {
+	if path == "" {
+		return ""
+	}
+	f, err := os.Open(path)
+	if err != nil {
+		return ""
+	}
+	defer f.Close()
+
+	type titleEntry struct {
+		Type        string `json:"type"`
+		CustomTitle string `json:"customTitle"`
+	}
+
+	var latest string
+	scanner := bufio.NewScanner(f)
+	scanner.Buffer(make([]byte, 64*1024), 4*1024*1024)
+	for scanner.Scan() {
+		line := scanner.Bytes()
+		if len(line) == 0 {
+			continue
+		}
+		var entry titleEntry
+		if err := json.Unmarshal(line, &entry); err != nil {
+			continue
+		}
+		if entry.Type == "custom-title" && entry.CustomTitle != "" {
+			latest = entry.CustomTitle
+		}
+	}
+	return latest
 }
 
 // FormatDuration formats milliseconds into a human-readable duration.

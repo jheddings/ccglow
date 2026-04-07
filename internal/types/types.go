@@ -2,13 +2,14 @@ package types
 
 // SessionData represents the JSON session data piped from Claude Code.
 type SessionData struct {
-	CWD           string           `json:"cwd"`
-	SessionID     string           `json:"session_id,omitempty"`
-	Model         *ModelInfo       `json:"model,omitempty"`
-	Cost          *CostInfo        `json:"cost,omitempty"`
-	ContextWindow *ContextWindow   `json:"context_window,omitempty"`
-	Version       string           `json:"version,omitempty"`
-	OutputStyle   *OutputStyleInfo `json:"output_style,omitempty"`
+	CWD            string           `json:"cwd"`
+	SessionID      string           `json:"session_id,omitempty"`
+	TranscriptPath string           `json:"transcript_path,omitempty"`
+	Model          *ModelInfo       `json:"model,omitempty"`
+	Cost           *CostInfo        `json:"cost,omitempty"`
+	ContextWindow  *ContextWindow   `json:"context_window,omitempty"`
+	Version        string           `json:"version,omitempty"`
+	OutputStyle    *OutputStyleInfo `json:"output_style,omitempty"`
 }
 
 // ModelInfo contains model identification from the session.

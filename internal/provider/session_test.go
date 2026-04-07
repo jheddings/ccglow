@@ -1,6 +1,8 @@
 package provider
 
 import (
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/jheddings/ccglow/internal/types"
@@ -123,6 +125,80 @@ func TestSessionProviderDurationMinutes(t *testing.T) {
 	}
 	if dur["api_min"] != 8 {
 		t.Errorf("expected api_min 8, got %v", dur["api_min"])
+	}
+}
+
+func writeTranscript(t *testing.T, lines ...string) string {
+	t.Helper()
+	dir := t.TempDir()
+	path := filepath.Join(dir, "transcript.jsonl")
+	content := ""
+	for _, l := range lines {
+		content += l + "\n"
+	}
+	if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	return path
+}
+
+func TestSessionProviderName(t *testing.T) {
+	p := &sessionProvider{}
+	path := writeTranscript(t,
+		`{"type":"user","message":{"role":"user","content":"hi"}}`,
+		`{"type":"custom-title","customTitle":"first-name"}`,
+		`{"type":"assistant","message":{"role":"assistant","content":"hello"}}`,
+		`{"type":"custom-title","customTitle":"latest-name"}`,
+		`{"type":"assistant","message":{"role":"assistant","content":"world"}}`,
+	)
+	sess := &types.SessionData{CWD: "/tmp", TranscriptPath: path}
+
+	result, err := p.Resolve(sess)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := sessionValues(result)["name"]; got != "latest-name" {
+		t.Errorf("expected latest-name, got %v", got)
+	}
+}
+
+func TestSessionProviderNameMissing(t *testing.T) {
+	p := &sessionProvider{}
+	path := writeTranscript(t,
+		`{"type":"user","message":{"role":"user","content":"hi"}}`,
+	)
+	sess := &types.SessionData{CWD: "/tmp", TranscriptPath: path}
+
+	result, err := p.Resolve(sess)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := sessionValues(result)["name"]; got != "" {
+		t.Errorf("expected empty name, got %v", got)
+	}
+}
+
+func TestSessionProviderNameNoTranscript(t *testing.T) {
+	p := &sessionProvider{}
+	sess := &types.SessionData{CWD: "/tmp"}
+	result, err := p.Resolve(sess)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := sessionValues(result)["name"]; got != "" {
+		t.Errorf("expected empty name, got %v", got)
+	}
+}
+
+func TestSessionProviderNameMissingFile(t *testing.T) {
+	p := &sessionProvider{}
+	sess := &types.SessionData{CWD: "/tmp", TranscriptPath: "/nonexistent/path.jsonl"}
+	result, err := p.Resolve(sess)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := sessionValues(result)["name"]; got != "" {
+		t.Errorf("expected empty name, got %v", got)
 	}
 }
 
