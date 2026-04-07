@@ -72,6 +72,14 @@ type SegmentNode struct {
 	Style    *StyleAttrs   `json:"style,omitempty"`
 	Children []SegmentNode `json:"children,omitempty"`
 
+	// Flex marks this node as an elastic spacer. Resolved at line-finalize
+	// time after all sibling text is measured. Top-level only; flex inside
+	// a children group is ignored.
+	Flex bool `json:"flex,omitempty"`
+	// Fill is the character used to fill flex space. Defaults to a single
+	// space when empty.
+	Fill string `json:"fill,omitempty"`
+
 	// EnabledFn is set programmatically (presets) and takes precedence over Enabled.
 	EnabledFn func(*SessionData) bool `json:"-"`
 }

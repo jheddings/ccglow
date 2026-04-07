@@ -550,6 +550,126 @@ func TestTree_ExprTakesPrecedenceOverCommand(t *testing.T) {
 	}
 }
 
+func TestTree_FlexFillsRemainingWidth(t *testing.T) {
+	style.SetColorLevel(0)
+	defer style.SetColorLevel(1)
+	t.Setenv("COLUMNS", "20")
+
+	sess := &types.SessionData{CWD: "/tmp"}
+	tree := []types.SegmentNode{
+		{Value: "left"},  // 4 chars
+		{Flex: true},     // fills remainder
+		{Value: "right"}, // 5 chars
+	}
+
+	got := Tree(tree, sess, map[string]any{}, map[string]string{})
+	want := "left           right" // 4 + 11 spaces + 5 = 20
+	if got != want {
+		t.Errorf("flex render = %q (len %d), want %q (len %d)", got, len(got), want, len(want))
+	}
+}
+
+func TestTree_FlexCustomFill(t *testing.T) {
+	style.SetColorLevel(0)
+	defer style.SetColorLevel(1)
+	t.Setenv("COLUMNS", "10")
+
+	sess := &types.SessionData{CWD: "/tmp"}
+	tree := []types.SegmentNode{
+		{Value: "a"},
+		{Flex: true, Fill: "-"},
+		{Value: "b"},
+	}
+
+	got := Tree(tree, sess, map[string]any{}, map[string]string{})
+	want := "a--------b"
+	if got != want {
+		t.Errorf("flex with fill = %q, want %q", got, want)
+	}
+}
+
+func TestTree_FlexCollapsesOnOverflow(t *testing.T) {
+	style.SetColorLevel(0)
+	defer style.SetColorLevel(1)
+	t.Setenv("COLUMNS", "5")
+
+	sess := &types.SessionData{CWD: "/tmp"}
+	tree := []types.SegmentNode{
+		{Value: "longer"}, // already 6 > 5
+		{Flex: true},
+		{Value: "x"},
+	}
+
+	got := Tree(tree, sess, map[string]any{}, map[string]string{})
+	want := "longerx"
+	if got != want {
+		t.Errorf("overflow collapse = %q, want %q", got, want)
+	}
+}
+
+func TestTree_FlexEvenSplit(t *testing.T) {
+	style.SetColorLevel(0)
+	defer style.SetColorLevel(1)
+	t.Setenv("COLUMNS", "12")
+
+	sess := &types.SessionData{CWD: "/tmp"}
+	tree := []types.SegmentNode{
+		{Value: "a"},
+		{Flex: true},
+		{Value: "b"},
+		{Flex: true},
+		{Value: "c"},
+	}
+
+	got := Tree(tree, sess, map[string]any{}, map[string]string{})
+	// 12 - 3 = 9, split across 2 flex => 4 and 5 (or 5 and 4)
+	if len(got) != 12 {
+		t.Errorf("even split len = %d, want 12 (got %q)", len(got), got)
+	}
+	if got[0] != 'a' || got[len(got)-1] != 'c' {
+		t.Errorf("even split bookends wrong: %q", got)
+	}
+}
+
+func TestTree_FlexPerLine(t *testing.T) {
+	style.SetColorLevel(0)
+	defer style.SetColorLevel(1)
+	t.Setenv("COLUMNS", "10")
+
+	sess := &types.SessionData{CWD: "/tmp"}
+	tree := []types.SegmentNode{
+		{Value: "a"},
+		{Flex: true},
+		{Value: "b"},
+		{Value: "\n"},
+		{Value: "c"},
+		{Flex: true},
+		{Value: "d"},
+	}
+
+	got := Tree(tree, sess, map[string]any{}, map[string]string{})
+	want := "a        b\nc        d"
+	if got != want {
+		t.Errorf("per-line flex = %q, want %q", got, want)
+	}
+}
+
+func TestTree_FlexNoOpWithoutFlex(t *testing.T) {
+	style.SetColorLevel(0)
+	defer style.SetColorLevel(1)
+	t.Setenv("COLUMNS", "20")
+
+	sess := &types.SessionData{CWD: "/tmp"}
+	tree := []types.SegmentNode{
+		{Value: "hello"},
+	}
+
+	got := Tree(tree, sess, map[string]any{}, map[string]string{})
+	if got != "hello" {
+		t.Errorf("no-flex line should not be padded, got %q", got)
+	}
+}
+
 // testProvider implements DataProvider for tests.
 type testProvider struct{}
 

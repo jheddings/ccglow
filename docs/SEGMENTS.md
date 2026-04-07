@@ -127,7 +127,7 @@ Battery segments return zero values on machines without a battery.
 
 ## Node Types
 
-There are three kinds of atomic nodes:
+There are four kinds of atomic nodes:
 
 ### `expr` — Expression nodes
 
@@ -179,6 +179,32 @@ empty strings.
   collapse silently, just like an `expr` node with no data.
 - **Precedence**: If both `expr` and `command` are set on the same node, `expr`
   wins. The dispatch order is: Children > Value > Expr > Command.
+
+### `flex` — Elastic spacer
+
+Expands to fill the remaining terminal width on its line. Enables
+right-alignment: put some segments to the left, a `flex`, then the segments
+you want on the right.
+
+```json
+{ "segments": [
+  { "expr": "pwd.name" },
+  { "flex": true },
+  { "expr": "context.percent.used" }
+] }
+```
+
+- Top-level only. A `flex` nested inside a `children` group is ignored.
+- Defaults to filling with spaces. Set `fill` to any single character (e.g.
+  `"·"` or `"─"`) to use a different fill.
+- Each line has its own flex resolution — multi-line layouts using `newline`
+  segments can have one or more `flex` per line.
+- Multiple flex segments on the same line split the remaining width evenly.
+- If non-flex content already exceeds terminal width, flex collapses to zero.
+- Terminal width is read from `$COLUMNS`, falling back to a `TIOCGWINSZ`
+  ioctl on stdout, then to 80. Claude Code does not currently export
+  `COLUMNS` to the statusline subprocess, so exporting it from your shell
+  config (e.g. `export COLUMNS`) is the most reliable option.
 
 ## Node Properties
 
