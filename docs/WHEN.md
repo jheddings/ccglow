@@ -28,7 +28,7 @@ not just the one that owns the current node.
 | Provider | Available Fields                                                                                                                                              |
 | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | git      | `git.branch`, `git.insertions`, `git.deletions`, `git.modified`, `git.staged`, `git.untracked`, `git.owner`, `git.repo`, `git.worktree`                      |
-| context  | `context.tokens`, `context.size`, `context.percent.used`, `context.percent.remaining`, `context.input`, `context.output`                                      |
+| context  | `context.tokens`, `context.size`, `context.percent.used`, `context.percent.remaining`, `context.input`, `context.output`, `context.bar`                                 |
 | model    | `model.name`, `model.id`                                                                                                                                      |
 | cost     | `cost.usd`, `cost.total`                                                                                                                                      |
 | speed    | `speed.input`, `speed.output`, `speed.total`                                                                                                                  |

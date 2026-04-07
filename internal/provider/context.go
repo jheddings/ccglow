@@ -2,9 +2,12 @@ package provider
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/jheddings/ccglow/internal/types"
 )
+
+const contextBarWidth = 10
 
 type contextProvider struct{}
 
@@ -20,6 +23,7 @@ func (p *contextProvider) Resolve(session *types.SessionData) (*types.ProviderRe
 		},
 		"input":  "",
 		"output": "",
+		"bar":    renderBar(0, contextBarWidth),
 	}
 
 	result := &types.ProviderResult{
@@ -53,6 +57,8 @@ func (p *contextProvider) Resolve(session *types.SessionData) (*types.ProviderRe
 		pct["used"] = cw.UsedPercentage
 	}
 
+	ctx["bar"] = renderBar(cw.UsedPercentage, contextBarWidth)
+
 	if cw.RemainingPercentage > 0 || cw.CurrentUsage != nil {
 		pct["remaining"] = cw.RemainingPercentage
 	}
@@ -68,6 +74,22 @@ func (p *contextProvider) Resolve(session *types.SessionData) (*types.ProviderRe
 	}
 
 	return result, nil
+}
+
+// renderBar renders a Unicode progress bar for the given percentage (0-100)
+// and width in cells. Filled cells use █, empty cells use ░.
+func renderBar(percent, width int) string {
+	if width <= 0 {
+		return ""
+	}
+	if percent < 0 {
+		percent = 0
+	}
+	if percent > 100 {
+		percent = 100
+	}
+	filled := percent * width / 100
+	return strings.Repeat("█", filled) + strings.Repeat("░", width-filled)
 }
 
 // FormatTokens formats a token count for display (e.g. 1500000 -> "1.5M").
