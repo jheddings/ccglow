@@ -91,6 +91,7 @@ scales the same way as tokens: raw below 1K, `n.nK t/s` above.
 | `session.duration.total_min` | Wall-clock time in minutes (int) | `135`           |
 | `session.duration.api_min`   | API time in minutes (int)        | `8`             |
 | `session.id`                 | Session identifier               | `abc-123`       |
+| `session.name`               | Custom name set via `/rename`    | `auth-refactor` |
 | `session.lines-added`        | Total lines added this session   | `1380`          |
 | `session.lines-removed`      | Total lines removed this session | `21`            |
 
