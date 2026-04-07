@@ -138,16 +138,16 @@ func run(presetName, configPath, format, stdin string) (string, map[string]any) 
 	env, defaultFormats := render.BuildEnv(providers.All(), sess)
 	log.Debug().Int("providers", len(env)).Msg("env built")
 
-	tree := resolveTree(presetName, configPath)
+	tree, opts := resolveTree(presetName, configPath)
 	log.Debug().Int("count", len(tree)).Msg("tree resolved")
 
-	output := render.Tree(tree, sess, env, defaultFormats)
+	output := render.TreeWith(tree, sess, env, defaultFormats, opts)
 	log.Debug().Msg("render complete")
 
 	return output, env
 }
 
-func resolveTree(presetName, configPath string) []types.SegmentNode {
+func resolveTree(presetName, configPath string) ([]types.SegmentNode, render.Options) {
 	if configPath != "" {
 		data, err := os.ReadFile(configPath)
 		if err != nil {
@@ -159,7 +159,8 @@ func resolveTree(presetName, configPath string) []types.SegmentNode {
 				log.Error().Err(err).Str("path", configPath).Msg("failed to parse config")
 			} else if len(tree) > 0 {
 				log.Debug().Int("count", len(tree)).Str("path", configPath).Msg("config tree parsed")
-				return tree
+				cfgOpts := config.ParseOptions(data)
+				return tree, render.Options{Width: cfgOpts.Width, WidthOffset: cfgOpts.WidthOffset}
 			} else {
 				log.Warn().Str("path", configPath).Msg("config file produced empty tree")
 			}
@@ -168,9 +169,9 @@ func resolveTree(presetName, configPath string) []types.SegmentNode {
 
 	if tree := preset.Get(presetName); tree != nil {
 		log.Debug().Str("preset", presetName).Msg("using preset")
-		return tree
+		return tree, render.Options{}
 	}
 
 	log.Debug().Msg("falling back to default preset")
-	return preset.Get("default")
+	return preset.Get("default"), render.Options{}
 }
