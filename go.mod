@@ -4,7 +4,7 @@ go 1.26.3
 
 require (
 	github.com/expr-lang/expr v1.17.8
-	github.com/mattn/go-runewidth v0.0.23
+	github.com/mattn/go-runewidth v0.0.24
 	github.com/rs/zerolog v1.35.1
 	github.com/spf13/cobra v1.10.2
 	golang.org/x/sys v0.45.0
