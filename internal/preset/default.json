@@ -42,6 +42,11 @@
       "style": { "color": "cyan", "prefix": "  ?" }
     },
     {
+      "expr": "worktree.name",
+      "when": "worktree.active",
+      "style": { "color": "magenta", "bold": true, "prefix": "  " }
+    },
+    {
       "expr": "agent.name",
       "when": "agent.active",
       "style": { "color": "magentaBright", "bold": true, "prefix": "  " }

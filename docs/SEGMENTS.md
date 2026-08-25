@@ -30,14 +30,69 @@ navigable path display.
 | `git.modified`   | Count of modified (unstaged) files                | `3`            |
 | `git.staged`     | Count of staged files                             | `2`            |
 | `git.untracked`  | Count of untracked files                          | `5`            |
-| `git.owner`      | Repository owner extracted from the remote URL    | `jheddings`    |
-| `git.repo`       | Repository name extracted from the remote URL     | `ccglow`       |
+| `git.owner`      | Repository owner                                  | `jheddings`    |
+| `git.repo`       | Repository name                                   | `ccglow`       |
+| `git.host`       | Repository host                                   | `github.com`   |
 | `git.worktree`   | Linked worktree name (empty in main working copy) | `docs-update`  |
 
-All git segments require a git repository in the current working directory.
-Remote-based segments (`git.owner`, `git.repo`) parse the `origin` remote URL
-and handle both SSH and HTTPS formats. When not in a git repo, all git segments
-return their zero values (`""` for strings, `0` for integers).
+Most git segments require a git repository in the current working directory.
+When not in a git repo, they return their zero values (`""` for strings, `0`
+for integers).
+
+`git.owner`, `git.repo`, `git.host`, and `git.worktree` come from Claude Code
+directly when it supplies them, which avoids two subprocesses per render. They
+fall back to parsing the `origin` remote (both SSH and HTTPS formats) and
+inspecting the working copy when it doesn't — outside a git repo, with no
+`origin` remote, or on older Claude Code versions. `git.host` is only
+available from Claude Code, so it stays empty on the fallback path.
+
+## Worktree — `worktree`
+
+| Segment                    | Description                            | Example Output              |
+| -------------------------- | -------------------------------------- | --------------------------- |
+| `worktree.name`            | Active worktree name                   | `my-feature`                |
+| `worktree.path`            | Worktree directory                     | `~/.claude/worktrees/my-feature` |
+| `worktree.branch`          | Branch checked out in the worktree     | `worktree-my-feature`       |
+| `worktree.original_cwd`    | Directory before entering the worktree | `~/Projects/ccglow`         |
+| `worktree.original_branch` | Branch before entering the worktree    | `main`                      |
+| `worktree.active`          | Whether a worktree is active (bool)    | `true`                      |
+
+`worktree.name` and `worktree.active` are set for any linked worktree. The
+remaining segments need a `--worktree` session, and `branch` /
+`original_branch` are additionally empty for hook-based worktrees — so gate
+them individually rather than assuming they arrive together.
+
+Use `worktree.active` to make the whole group vanish in ordinary sessions:
+
+```json
+{
+  "when": "worktree.active",
+  "children": [
+    { "expr": "worktree.name", "style": { "color": "magenta", "prefix": " ⑂ " } },
+    {
+      "expr": "worktree.original_branch",
+      "when": "worktree.original_branch != ''",
+      "style": { "color": "brightblack", "prefix": " ← " }
+    }
+  ]
+}
+```
+
+## Workspace — `workspace`
+
+| Segment                 | Description                                | Example Output      |
+| ----------------------- | ------------------------------------------ | ------------------- |
+| `workspace.project_dir` | Directory where Claude Code was launched   | `~/Projects/ccglow` |
+| `workspace.added_dirs`  | Count of `/add-dir` directories (int)      | `2`                 |
+
+`workspace.project_dir` can differ from `pwd.path` when the working directory
+changes during a session. `workspace.added_dirs` is a count rather than a list,
+since a list of paths doesn't fit a statusline — use it as a `when` condition
+or a small badge:
+
+```json
+{ "expr": "workspace.added_dirs", "when": "workspace.added_dirs > 0", "format": "+%d dirs" }
+```
 
 ## Context — `context`
 

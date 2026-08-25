@@ -166,3 +166,66 @@ func TestParse_AgentAndSessionNameAbsent(t *testing.T) {
 		t.Errorf("expected nil agent, got %+v", s.Agent)
 	}
 }
+
+func TestParse_WorkspaceAndWorktree(t *testing.T) {
+	input := `{
+		"cwd": "/current/dir",
+		"workspace": {
+			"current_dir": "/current/dir",
+			"project_dir": "/original/project",
+			"added_dirs": ["/extra/one"],
+			"git_worktree": "feature-xyz",
+			"repo": {"host": "github.com", "owner": "anthropics", "name": "claude-code"}
+		},
+		"worktree": {
+			"name": "my-feature",
+			"path": "/path/to/.claude/worktrees/my-feature",
+			"branch": "worktree-my-feature",
+			"original_cwd": "/path/to/project",
+			"original_branch": "main"
+		}
+	}`
+	s := Parse(input)
+	if s == nil {
+		t.Fatal("expected non-nil session")
+	}
+	if s.Workspace == nil || s.Workspace.ProjectDir != "/original/project" {
+		t.Errorf("unexpected workspace %+v", s.Workspace)
+	}
+	if s.Workspace.GitWorktree != "feature-xyz" {
+		t.Errorf("expected git_worktree feature-xyz, got %q", s.Workspace.GitWorktree)
+	}
+	if len(s.Workspace.AddedDirs) != 1 {
+		t.Errorf("expected 1 added dir, got %d", len(s.Workspace.AddedDirs))
+	}
+	if s.Workspace.Repo == nil || s.Workspace.Repo.Owner != "anthropics" {
+		t.Errorf("unexpected repo %+v", s.Workspace.Repo)
+	}
+	if s.Worktree == nil || s.Worktree.Name != "my-feature" {
+		t.Errorf("unexpected worktree %+v", s.Worktree)
+	}
+	if s.Worktree.OriginalBranch != "main" {
+		t.Errorf("expected original_branch main, got %q", s.Worktree.OriginalBranch)
+	}
+}
+
+// repo and git_worktree are independently absent from an otherwise present
+// workspace object, and worktree is absent outside --worktree sessions.
+func TestParse_WorkspacePartial(t *testing.T) {
+	s := Parse(`{"cwd": "/tmp", "workspace": {"current_dir": "/tmp", "added_dirs": []}}`)
+	if s == nil {
+		t.Fatal("expected non-nil session")
+	}
+	if s.Workspace == nil {
+		t.Fatal("expected non-nil workspace")
+	}
+	if s.Workspace.Repo != nil {
+		t.Errorf("expected nil repo, got %+v", s.Workspace.Repo)
+	}
+	if s.Workspace.GitWorktree != "" {
+		t.Errorf("expected empty git_worktree, got %q", s.Workspace.GitWorktree)
+	}
+	if s.Worktree != nil {
+		t.Errorf("expected nil worktree, got %+v", s.Worktree)
+	}
+}

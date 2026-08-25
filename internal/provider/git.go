@@ -31,11 +31,17 @@ func (p *gitProvider) Resolve(session *types.SessionData) (*types.ProviderResult
 		"worktree":   "",
 		"owner":      "",
 		"repo":       "",
+		"host":       "",
 	}
 
 	result := &types.ProviderResult{
 		Values: map[string]any{"git": git},
 	}
+
+	// Claude Code supplies the worktree name and repo identity on stdin, so
+	// prefer those over shelling out. They resolve before the git-available
+	// check because they do not depend on git being present.
+	stdinWorktree, stdinRepo := applyStdinRepoInfo(git, session.Workspace)
 
 	if !gitAvailable(cwd) {
 		return result, nil
@@ -64,16 +70,45 @@ func (p *gitProvider) Resolve(session *types.SessionData) (*types.ProviderResult
 		git["untracked"] = unt
 	}
 
-	if wt := detectWorktree(cwd); wt != "" {
-		git["worktree"] = wt
+	if !stdinWorktree {
+		if wt := detectWorktree(cwd); wt != "" {
+			git["worktree"] = wt
+		}
 	}
 
-	if owner, repo, err := parseRemoteOwnerRepo(cwd); err == nil {
-		git["owner"] = owner
-		git["repo"] = repo
+	if !stdinRepo {
+		if owner, repo, err := parseRemoteOwnerRepo(cwd); err == nil {
+			git["owner"] = owner
+			git["repo"] = repo
+		}
 	}
 
 	return result, nil
+}
+
+// applyStdinRepoInfo fills the worktree and repo values from the stdin
+// workspace object, reporting which of the two were satisfied so the caller
+// can skip the corresponding subprocess. Both are absent on older Claude Code
+// versions, and workspace.repo is absent outside a repo or with no origin
+// remote, so an unsatisfied value falls back to shelling out.
+func applyStdinRepoInfo(git map[string]any, workspace *types.WorkspaceInfo) (worktree, repo bool) {
+	if workspace == nil {
+		return false, false
+	}
+
+	if workspace.GitWorktree != "" {
+		git["worktree"] = workspace.GitWorktree
+		worktree = true
+	}
+
+	if workspace.Repo != nil && workspace.Repo.Name != "" {
+		git["owner"] = workspace.Repo.Owner
+		git["repo"] = workspace.Repo.Name
+		git["host"] = workspace.Repo.Host
+		repo = true
+	}
+
+	return worktree, repo
 }
 
 func parseGitStatus(cwd string) (modified, staged, untracked int, err error) {

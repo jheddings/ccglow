@@ -25,6 +25,11 @@
       "style": { "color": "#E0E0FF", "bgcolor": "#1A1A2E", "bold": true, "prefix": " \ue0a0 " }
     },
     {
+      "expr": "worktree.name",
+      "when": "worktree.active",
+      "style": { "color": "#FFB86C", "bgcolor": "#1A1A2E", "bold": true, "prefix": " \uef81 " }
+    },
+    {
       "value": "\ue0b0",
       "style": { "color": "#1A1A2E", "bgcolor": "#0D47A1" }
     },

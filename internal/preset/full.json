@@ -54,6 +54,40 @@
       ]
     },
     {
+      "when": "worktree.active",
+      "style": {
+        "prefix": " | ",
+        "color": "240"
+      },
+      "children": [
+        {
+          "expr": "worktree.name",
+          "style": {
+            "color": "magenta",
+            "bold": true,
+            "prefix": "\uef81 "
+          }
+        },
+        {
+          "expr": "worktree.original_branch",
+          "when": "worktree.original_branch != ''",
+          "style": {
+            "color": "240",
+            "prefix": " ← "
+          }
+        }
+      ]
+    },
+    {
+      "expr": "workspace.added_dirs",
+      "when": "workspace.added_dirs > 0",
+      "format": "+%d dirs",
+      "style": {
+        "color": "240",
+        "prefix": " | "
+      }
+    },
+    {
       "style": {
         "prefix": " | ",
         "color": "240"
