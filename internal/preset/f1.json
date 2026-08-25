@@ -66,6 +66,17 @@
       }
     },
     {
+      "expr": "agent.name",
+      "when": "agent.active",
+      "style": {
+        "color": "#FFD700",
+        "bgcolor": "#003DA5",
+        "bold": true,
+        "prefix": "\uf2c0 ",
+        "suffix": " "
+      }
+    },
+    {
       "value": "\ue0b0",
       "style": { "color": "#003DA5", "bgcolor": "#2E1A47" }
     },
