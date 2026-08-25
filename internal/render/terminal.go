@@ -26,9 +26,13 @@ const DefaultTerminalWidth = 80
 // to account for host chrome (e.g. Claude Code renders the statusline
 // inside a bordered, padded box that consumes ~4 cells of usable width).
 //
-// Steps 4 and 5 are necessary because Claude Code's statusline subprocess
-// receives piped stdio (no controlling tty on any standard fd) and does
-// not export COLUMNS.
+// Claude Code sets COLUMNS and LINES to the current terminal dimensions
+// before running the statusline command (as of v2.1.153), so step 2
+// normally resolves there. Steps 4 and 5 remain as fallbacks for older
+// versions and other hosts: the statusline subprocess receives piped stdio,
+// so there is no controlling tty on any standard fd for step 3. Note that
+// `tput cols` cannot read the real terminal size from inside a subprocess
+// whose output is captured, so step 5 is a last resort before the default.
 func TerminalWidth() int {
 	w := detectWidth()
 	if off := offsetFromEnv(); off > 0 && w > off {
