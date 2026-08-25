@@ -117,6 +117,19 @@ Percentages run 0–100, so `when` conditions compare directly:
 { "expr": "limits.session.percent", "when": "limits.session.percent > 80", "style": { "color": "red" } }
 ```
 
+A bare percentage next to a `5h` label reads as two unrelated fields. The
+shipped presets bind them by putting the label in its own muted node, so the
+colour shift groups the pair:
+
+```json
+{ "value": "5h:", "when": "limits.session.percent > 0", "style": { "color": "240" } },
+{ "expr": "limits.session.percent", "when": "limits.session.percent > 0", "style": { "color": "yellow" } }
+```
+
+The label has to be a separate node rather than a `prefix`, since a prefix is
+painted in its own node's colour and would come out yellow along with the
+value.
+
 The `reset` segments render the time *remaining*, which means they go stale
 between renders. Statusline updates are event-driven, so if you display a
 countdown, set `refreshInterval` in your `statusLine` settings to re-run

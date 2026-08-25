@@ -57,6 +57,16 @@
       "style": { "color": "yellow", "prefix": "  " }
     },
     {
+      "value": "5h:",
+      "when": "limits.session.percent >= 80",
+      "style": { "color": "240", "prefix": "  " }
+    },
+    {
+      "expr": "limits.session.percent",
+      "when": "limits.session.percent >= 80",
+      "style": { "color": "red" }
+    },
+    {
       "expr": "cost.total",
       "when": "cost.total > 5",
       "style": { "color": "red", "prefix": "  " }

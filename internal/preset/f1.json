@@ -106,6 +106,30 @@
       }
     },
     {
+      "when": "limits.session.percent > 0",
+      "style": { "bgcolor": "#006633", "suffix": " " },
+      "children": [
+        {
+          "value": "5h:",
+          "style": { "color": "#7FA98F", "bgcolor": "#006633" }
+        },
+        {
+          "expr": "limits.session.percent",
+          "style": { "color": "#FFD700", "bgcolor": "#006633" }
+        },
+        {
+          "value": "7d:",
+          "when": "limits.weekly.percent > 0",
+          "style": { "color": "#7FA98F", "bgcolor": "#006633", "prefix": " " }
+        },
+        {
+          "expr": "limits.weekly.percent",
+          "when": "limits.weekly.percent > 0",
+          "style": { "color": "#B39DDB", "bgcolor": "#006633" }
+        }
+      ]
+    },
+    {
       "value": "\ue0b0",
       "style": { "color": "#006633", "bgcolor": "#FF8000" }
     },
