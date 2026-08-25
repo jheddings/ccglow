@@ -168,6 +168,51 @@
       },
       "children": [
         {
+          "value": "5h:",
+          "when": "limits.session.percent > 0",
+          "style": {
+            "color": "240"
+          }
+        },
+        {
+          "expr": "limits.session.percent",
+          "when": "limits.session.percent > 0",
+          "style": {
+            "color": "yellow"
+          }
+        },
+        {
+          "value": "7d:",
+          "when": "limits.weekly.percent > 0",
+          "style": {
+            "color": "240",
+            "prefix": " "
+          }
+        },
+        {
+          "expr": "limits.weekly.percent",
+          "when": "limits.weekly.percent > 0",
+          "style": {
+            "color": "cyan"
+          }
+        },
+        {
+          "expr": "limits.session.reset",
+          "when": "limits.session.reset != ''",
+          "style": {
+            "color": "240",
+            "prefix": " ~"
+          }
+        }
+      ]
+    },
+    {
+      "style": {
+        "prefix": " | ",
+        "color": "240"
+      },
+      "children": [
+        {
           "expr": "claude.version",
           "style": {
             "color": "240",
@@ -175,11 +220,17 @@
           }
         },
         {
-          "expr": "claude.style",
           "style": {
-            "color": "cyan",
             "prefix": " · "
-          }
+          },
+          "children": [
+            {
+              "expr": "claude.style",
+              "style": {
+                "color": "cyan"
+              }
+            }
+          ]
         }
       ]
     },

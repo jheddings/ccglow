@@ -13,6 +13,23 @@ type SessionData struct {
 	Effort         *EffortInfo      `json:"effort,omitempty"`
 	Thinking       *ThinkingInfo    `json:"thinking,omitempty"`
 	FastMode       bool             `json:"fast_mode,omitempty"`
+	RateLimits     *RateLimits      `json:"rate_limits,omitempty"`
+}
+
+// RateLimits contains subscription usage windows. Claude Code sends this only
+// for Claude.ai subscribers, and only after the first API response in the
+// session. Each window may be independently absent.
+type RateLimits struct {
+	FiveHour *RateLimitWindow `json:"five_hour,omitempty"`
+	SevenDay *RateLimitWindow `json:"seven_day,omitempty"`
+}
+
+// RateLimitWindow is the usage state of a single rate limit window. Note the
+// units: UsedPercentage is 0-100 (not 0-1) and ResetsAt is epoch seconds (not
+// milliseconds), both of which differ from the OAuth usage API's shape.
+type RateLimitWindow struct {
+	UsedPercentage float64 `json:"used_percentage"`
+	ResetsAt       int64   `json:"resets_at"`
 }
 
 // EffortInfo contains the session's reasoning effort level. Claude Code omits
