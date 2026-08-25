@@ -8,6 +8,7 @@ import (
 	"github.com/jheddings/ccglow/internal/command"
 	"github.com/jheddings/ccglow/internal/eval"
 	"github.com/jheddings/ccglow/internal/style"
+	"github.com/jheddings/ccglow/internal/term"
 	"github.com/jheddings/ccglow/internal/types"
 	"github.com/rs/zerolog/log"
 )
@@ -197,11 +198,11 @@ func isFlexEnabled(node *types.SegmentNode, session *types.SessionData, env map[
 }
 
 // resolveWidth picks the effective render width: explicit opts.Width if
-// set, otherwise TerminalWidth(); then subtracts opts.WidthOffset.
+// set, otherwise term.Width(); then subtracts opts.WidthOffset.
 func resolveWidth(opts Options) int {
 	w := opts.Width
 	if w <= 0 {
-		w = TerminalWidth()
+		w = term.Width()
 	}
 	if opts.WidthOffset > 0 && w > opts.WidthOffset {
 		w -= opts.WidthOffset
