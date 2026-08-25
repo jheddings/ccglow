@@ -18,6 +18,7 @@ func RegisterBuiltin(registry *Registry) {
 	registry.Register(&speedProvider{})
 	registry.Register(&claudeProvider{})
 	registry.Register(&systemProvider{})
+	registry.Register(&termProvider{})
 }
 
 // Registry maps provider names to their implementations.

@@ -268,6 +268,26 @@ ordinary sessions render unchanged:
 Disk usage is measured at the mount point of the current working directory.
 Battery segments return zero values on machines without a battery.
 
+## Terminal — `term`
+
+| Segment        | Description                | Example Output |
+| -------------- | -------------------------- | -------------- |
+| `term.columns` | Terminal width in columns  | `160`          |
+| `term.lines`   | Terminal height in rows    | `48`           |
+
+Claude Code sets `COLUMNS` and `LINES` before running the statusline command,
+so these track the real terminal and update on resize. Both are always
+positive — they fall back to a `TIOCGWINSZ` ioctl and then to `80`×`24` — so
+`when` comparisons are safe without a presence check.
+
+`term.columns` is the raw terminal width, before the `$CCGLOW_WIDTH_OFFSET`
+reserved for host chrome that `flex` layout uses. Use these to drop optional
+content on narrow terminals:
+
+```json
+{ "when": "term.columns > 120", "children": [{ "expr": "session.duration.total" }] }
+```
+
 ## Node Types
 
 There are four kinds of atomic nodes:
@@ -344,9 +364,10 @@ you want on the right.
 - Multiple flex segments on the same line split the remaining width evenly.
 - If non-flex content already exceeds terminal width, flex collapses to zero.
 - Terminal width is read from `$COLUMNS`, falling back to a `TIOCGWINSZ`
-  ioctl on stdout, then to 80. Claude Code does not currently export
-  `COLUMNS` to the statusline subprocess, so exporting it from your shell
-  config (e.g. `export COLUMNS`) is the most reliable option.
+  ioctl on stdout, then to 80. Claude Code sets `COLUMNS` before running the
+  statusline command, so this tracks terminal resizes automatically. Set
+  `$CCGLOW_WIDTH` to override it entirely, or `$CCGLOW_WIDTH_OFFSET` to
+  reserve cells for host chrome.
 
 ## Node Properties
 
