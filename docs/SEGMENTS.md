@@ -95,6 +95,34 @@ as `when` conditions on an icon:
 `cost.total` is the raw numeric value suitable for `when` conditions
 (e.g. `"when": "cost.total > 5"`).
 
+## Rate Limits — `limits`
+
+| Segment                   | Description                                | Example Output |
+| ------------------------- | ------------------------------------------ | -------------- |
+| `limits.session.percent`  | 5-hour window used (float, format `%.0f%%`) | `24%`          |
+| `limits.session.reset`    | Time until the 5-hour window resets        | `2h 14m`       |
+| `limits.session.reset_at` | Raw reset time, epoch seconds (int)        | `1738425600`   |
+| `limits.weekly.percent`   | 7-day window used (float, format `%.0f%%`)  | `41%`          |
+| `limits.weekly.reset`     | Time until the 7-day window resets         | `30h 0m`       |
+| `limits.weekly.reset_at`  | Raw reset time, epoch seconds (int)        | `1738857600`   |
+
+Claude Code sends these only for Claude.ai subscribers (Pro/Max), and only
+after the first API response in the session. Each window is independently
+absent, so a session may have `limits.session` populated and `limits.weekly`
+empty. All segments return zero values otherwise (`0` percent, `""` reset).
+
+Percentages run 0–100, so `when` conditions compare directly:
+
+```json
+{ "expr": "limits.session.percent", "when": "limits.session.percent > 80", "style": { "color": "red" } }
+```
+
+The `reset` segments render the time *remaining*, which means they go stale
+between renders. Statusline updates are event-driven, so if you display a
+countdown, set `refreshInterval` in your `statusLine` settings to re-run
+ccglow on a timer. A window whose reset time has already elapsed renders empty
+rather than a negative duration.
+
 ## Speed — `speed`
 
 | Segment        | Description                        | Example Output       |

@@ -94,3 +94,44 @@ func TestParse_EffortAbsent(t *testing.T) {
 		t.Error("expected fast mode false")
 	}
 }
+
+// used_percentage is 0-100 (not 0-1) and resets_at is epoch seconds (not ms).
+func TestParse_RateLimits(t *testing.T) {
+	input := `{
+		"cwd": "/tmp",
+		"rate_limits": {
+			"five_hour": {"used_percentage": 23.5, "resets_at": 1738425600},
+			"seven_day": {"used_percentage": 41.2, "resets_at": 1738857600}
+		}
+	}`
+	s := Parse(input)
+	if s == nil {
+		t.Fatal("expected non-nil session")
+	}
+	if s.RateLimits == nil {
+		t.Fatal("expected non-nil rate limits")
+	}
+	if s.RateLimits.FiveHour.UsedPercentage != 23.5 {
+		t.Errorf("expected 23.5, got %v", s.RateLimits.FiveHour.UsedPercentage)
+	}
+	if s.RateLimits.FiveHour.ResetsAt != 1738425600 {
+		t.Errorf("expected 1738425600, got %d", s.RateLimits.FiveHour.ResetsAt)
+	}
+	if s.RateLimits.SevenDay.UsedPercentage != 41.2 {
+		t.Errorf("expected 41.2, got %v", s.RateLimits.SevenDay.UsedPercentage)
+	}
+}
+
+// Each window may be independently absent.
+func TestParse_RateLimitsPartial(t *testing.T) {
+	s := Parse(`{"cwd": "/tmp", "rate_limits": {"five_hour": {"used_percentage": 10}}}`)
+	if s == nil {
+		t.Fatal("expected non-nil session")
+	}
+	if s.RateLimits.FiveHour == nil {
+		t.Fatal("expected non-nil five hour window")
+	}
+	if s.RateLimits.SevenDay != nil {
+		t.Errorf("expected nil seven day window, got %+v", s.RateLimits.SevenDay)
+	}
+}
