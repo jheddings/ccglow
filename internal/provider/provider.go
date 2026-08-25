@@ -12,6 +12,7 @@ func RegisterBuiltin(registry *Registry) {
 	registry.Register(&costProvider{})
 	registry.Register(&limitsProvider{})
 	registry.Register(&sessionProvider{})
+	registry.Register(&agentProvider{})
 	registry.Register(&speedProvider{})
 	registry.Register(&claudeProvider{})
 	registry.Register(&systemProvider{})

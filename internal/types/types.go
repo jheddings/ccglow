@@ -14,6 +14,14 @@ type SessionData struct {
 	Thinking       *ThinkingInfo    `json:"thinking,omitempty"`
 	FastMode       bool             `json:"fast_mode,omitempty"`
 	RateLimits     *RateLimits      `json:"rate_limits,omitempty"`
+	SessionName    string           `json:"session_name,omitempty"`
+	Agent          *AgentInfo       `json:"agent,omitempty"`
+}
+
+// AgentInfo identifies the agent driving the session. Claude Code sends this
+// only when running with --agent or with agent settings configured.
+type AgentInfo struct {
+	Name string `json:"name"`
 }
 
 // RateLimits contains subscription usage windows. Claude Code sends this only

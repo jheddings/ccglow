@@ -135,3 +135,34 @@ func TestParse_RateLimitsPartial(t *testing.T) {
 		t.Errorf("expected nil seven day window, got %+v", s.RateLimits.SevenDay)
 	}
 }
+
+func TestParse_AgentAndSessionName(t *testing.T) {
+	input := `{
+		"cwd": "/tmp",
+		"session_name": "auth-refactor",
+		"agent": {"name": "security-reviewer"}
+	}`
+	s := Parse(input)
+	if s == nil {
+		t.Fatal("expected non-nil session")
+	}
+	if s.SessionName != "auth-refactor" {
+		t.Errorf("expected auth-refactor, got %q", s.SessionName)
+	}
+	if s.Agent == nil || s.Agent.Name != "security-reviewer" {
+		t.Errorf("expected agent security-reviewer, got %+v", s.Agent)
+	}
+}
+
+func TestParse_AgentAndSessionNameAbsent(t *testing.T) {
+	s := Parse(`{"cwd": "/tmp"}`)
+	if s == nil {
+		t.Fatal("expected non-nil session")
+	}
+	if s.SessionName != "" {
+		t.Errorf("expected empty session name, got %q", s.SessionName)
+	}
+	if s.Agent != nil {
+		t.Errorf("expected nil agent, got %+v", s.Agent)
+	}
+}
