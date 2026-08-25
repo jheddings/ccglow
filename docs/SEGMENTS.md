@@ -61,6 +61,30 @@ Token formatting scales automatically: raw count below 1K, `nK` for thousands,
 | `model.name` | Model display name | `Opus 4.6 (1M context)` |
 | `model.id`   | Model identifier   | `claude-opus-4-6`       |
 
+## Effort — `effort`
+
+| Segment           | Description                              | Example Output |
+| ----------------- | ---------------------------------------- | -------------- |
+| `effort.level`    | Reasoning effort level                   | `high`         |
+| `effort.thinking` | Whether extended thinking is enabled     | `true`         |
+| `effort.fast`     | Whether fast mode is enabled             | `true`         |
+
+Where `model` describes model identity, `effort` describes how the model is
+currently behaving. All three values track the live session, so mid-session
+`/effort` changes appear on the next render.
+
+`effort.level` is one of `low`, `medium`, `high`, `xhigh`, or `max`. It is
+empty when the current model has no effort parameter, so gate it with
+`"when": "effort.level != ''"` rather than assuming a default. Ultracode is
+not a distinct level and reports as `xhigh`.
+
+`effort.thinking` and `effort.fast` are booleans, which makes them most useful
+as `when` conditions on an icon:
+
+```json
+{ "value": "🚀", "when": "effort.fast" }
+```
+
 ## Cost — `cost`
 
 | Segment      | Description                              | Example Output |

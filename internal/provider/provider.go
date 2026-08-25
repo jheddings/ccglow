@@ -8,6 +8,7 @@ func RegisterBuiltin(registry *Registry) {
 	registry.Register(&gitProvider{})
 	registry.Register(&contextProvider{})
 	registry.Register(&modelProvider{})
+	registry.Register(&effortProvider{})
 	registry.Register(&costProvider{})
 	registry.Register(&sessionProvider{})
 	registry.Register(&speedProvider{})
