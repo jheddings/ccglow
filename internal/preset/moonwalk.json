@@ -17,6 +17,11 @@
       "style": { "color": "#8FBC8F", "bgcolor": "#1C3A1C", "bold": true, "prefix": " \ue0a0 " }
     },
     {
+      "expr": "worktree.name",
+      "when": "worktree.active",
+      "style": { "color": "#FFB86C", "bgcolor": "#1C3A1C", "bold": true, "prefix": " \uef81 " }
+    },
+    {
       "expr": "git.insertions",
       "when": "value > 0",
       "style": { "color": "#50FA7B", "bgcolor": "#1C3A1C", "prefix": " +" }
