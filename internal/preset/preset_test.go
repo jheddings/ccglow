@@ -2,8 +2,81 @@ package preset
 
 import (
 	"encoding/json"
+	"strings"
 	"testing"
+
+	"github.com/jheddings/ccglow/internal/provider"
+	"github.com/jheddings/ccglow/internal/render"
+	"github.com/jheddings/ccglow/internal/types"
 )
+
+// collectExprs walks a segment tree and returns every expr string in it.
+func collectExprs(nodes []types.SegmentNode) []string {
+	var exprs []string
+	for i := range nodes {
+		node := &nodes[i]
+		if node.Expr != "" {
+			exprs = append(exprs, node.Expr)
+		}
+		exprs = append(exprs, collectExprs(node.Children)...)
+	}
+	return exprs
+}
+
+// lookup walks a dotted key path through the resolved provider env.
+func lookup(env map[string]any, key string) bool {
+	parts := strings.Split(key, ".")
+	current := env
+	for i, part := range parts {
+		val, ok := current[part]
+		if !ok {
+			return false
+		}
+		if i == len(parts)-1 {
+			return true
+		}
+		nested, ok := val.(map[string]any)
+		if !ok {
+			return false
+		}
+		current = nested
+	}
+	return false
+}
+
+// Segments fail silent by design: an expr that resolves to nothing collapses
+// out of the output rather than erroring. That makes a typo in a preset
+// invisible forever, so every expr shipped in a preset is checked against the
+// real resolved provider env. Providers populate their full key set with zero
+// values even when there is no data, so this passes without live session data.
+func TestPresetExprsResolve(t *testing.T) {
+	registry := provider.NewRegistry()
+	provider.RegisterBuiltin(registry)
+	env, _ := render.BuildEnv(registry.All(), &types.SessionData{CWD: t.TempDir()})
+
+	names := List()
+	if len(names) == 0 {
+		t.Fatal("expected at least one preset")
+	}
+
+	for _, name := range names {
+		nodes := Get(name)
+		if nodes == nil {
+			t.Errorf("%s: failed to load", name)
+			continue
+		}
+		exprs := collectExprs(nodes)
+		if len(exprs) == 0 {
+			t.Errorf("%s: no expr nodes found", name)
+			continue
+		}
+		for _, expr := range exprs {
+			if !lookup(env, expr) {
+				t.Errorf("%s: expr %q does not resolve against any provider", name, expr)
+			}
+		}
+	}
+}
 
 func TestGet_Default(t *testing.T) {
 	nodes := Get("default")

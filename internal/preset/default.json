@@ -42,6 +42,16 @@
       "style": { "color": "cyan", "prefix": "  ?" }
     },
     {
+      "expr": "effort.level",
+      "when": "effort.level != '' && effort.level != 'medium'",
+      "style": { "color": "cyan", "prefix": "  " }
+    },
+    {
+      "value": "fast",
+      "when": "effort.fast",
+      "style": { "color": "magenta", "prefix": "  " }
+    },
+    {
       "expr": "context.percent.used",
       "when": "value >= 50",
       "style": { "color": "yellow", "prefix": "  " }

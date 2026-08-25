@@ -43,6 +43,16 @@
       "style": { "color": "#A8D5A8", "bgcolor": "#1A2E1A", "prefix": " (", "suffix": ") " }
     },
     {
+      "value": "\uf0eb",
+      "when": "effort.thinking",
+      "style": { "color": "#F1FA8C", "bgcolor": "#1A2E1A", "suffix": " " }
+    },
+    {
+      "value": "\uf135",
+      "when": "effort.fast",
+      "style": { "color": "#FF79C6", "bgcolor": "#1A2E1A", "suffix": " " }
+    },
+    {
       "value": "\ue0b0",
       "style": { "color": "#1A2E1A", "bgcolor": "#142814" }
     },
