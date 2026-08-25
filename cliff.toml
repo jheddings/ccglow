@@ -51,11 +51,21 @@ commit_parsers = [
   # skip docs (design specs, implementation plans)
   { message = "^docs", skip = true },
 
-  # dependency updates — capture package name as scope
-  { message = "^fix\\(deps\\): update dependency (.+?) to", group = "<!-- 4 -->Dependencies", scope = "${1}" },
-  { message = "^chore\\(deps\\): update dependency (.+?) to", group = "<!-- 4 -->Dependencies", scope = "${1}" },
-  { message = "^fix\\(deps\\): update (.+?) monorepo to", group = "<!-- 4 -->Dependencies", scope = "${1}" },
-  { message = "^chore\\(deps\\): update (.+?) monorepo to", group = "<!-- 4 -->Dependencies", scope = "${1}" },
+  # dependency updates — route every deps bump to the Dependencies group,
+  # capturing the package name as scope. Renovate splits these between
+  # fix(deps) and chore(deps) depending on whether the dependency is a runtime
+  # one, so both types are matched together. Order matters: most specific
+  # first, so the lazy trailing rule doesn't swallow the descriptor words.
+  # Go repos say "module" where other ecosystems say "dependency", and the go
+  # directive has no package name at all — without those two rules the
+  # catch-all captures scopes like "module github.com/x" and "go module
+  # directive".
+  { message = "^(?:fix|chore)\\(deps\\): (?:update|bump) dependency (.+?) to", group = "<!-- 4 -->Dependencies", scope = "${1}" },
+  { message = "^(?:fix|chore)\\(deps\\): (?:update|bump) go module directive to", group = "<!-- 4 -->Dependencies", scope = "go" },
+  { message = "^(?:fix|chore)\\(deps\\): (?:update|bump) module (.+?) to", group = "<!-- 4 -->Dependencies", scope = "${1}" },
+  { message = "^(?:fix|chore)\\(deps\\): (?:update|bump) (.+?) monorepo", group = "<!-- 4 -->Dependencies", scope = "${1}" },
+  { message = "^(?:fix|chore)\\(deps\\): (?:update|bump) (.+?) (?:action|docker tag) to", group = "<!-- 4 -->Dependencies", scope = "${1}" },
+  { message = "^(?:fix|chore)\\(deps\\): (?:update|bump) (.+?) to", group = "<!-- 4 -->Dependencies", scope = "${1}" },
 
   # standard type mapping
   { message = "^feat", group = "<!-- 1 -->Features" },
