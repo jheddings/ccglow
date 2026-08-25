@@ -156,12 +156,35 @@ scales the same way as tokens: raw below 1K, `n.nK t/s` above.
 | `session.duration.total_min` | Wall-clock time in minutes (int) | `135`           |
 | `session.duration.api_min`   | API time in minutes (int)        | `8`             |
 | `session.id`                 | Session identifier               | `abc-123`       |
-| `session.name`               | Custom name set via `/rename`    | `auth-refactor` |
+| `session.name`               | Session name                     | `auth-refactor` |
 | `session.lines-added`        | Total lines added this session   | `1380`          |
 | `session.lines-removed`      | Total lines removed this session | `21`            |
 
 The `_min` variants are raw integers suitable for `when` conditions
 (e.g. `"when": "session.duration.total_min > 60"`).
+
+`session.name` is the custom name set with `--name` or `/rename` when one
+exists, otherwise the AI-generated session title. It is empty for a session
+with neither — the default display name (e.g. `my-app-3f`) does not count as
+a name.
+
+## Agent — `agent`
+
+| Segment        | Description                            | Example Output      |
+| -------------- | -------------------------------------- | ------------------- |
+| `agent.name`   | Agent driving the session              | `security-reviewer` |
+| `agent.active` | Whether this is an agent session (bool) | `true`              |
+
+Populated when Claude Code runs with `--agent` or with agent settings
+configured, and empty otherwise. Use `agent.active` to gate a whole group so
+ordinary sessions render unchanged:
+
+```json
+{
+  "when": "agent.active",
+  "children": [{ "expr": "agent.name", "style": { "color": "brightmagenta", "prefix": " 🤖 " } }]
+}
+```
 
 ## Claude — `claude`
 

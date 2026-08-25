@@ -7,8 +7,59 @@ import (
 
 	"github.com/jheddings/ccglow/internal/provider"
 	"github.com/jheddings/ccglow/internal/render"
+	"github.com/jheddings/ccglow/internal/style"
 	"github.com/jheddings/ccglow/internal/types"
 )
+
+// collectStyles walks a segment tree and returns every style attached to it.
+func collectStyles(nodes []types.SegmentNode) []*types.StyleAttrs {
+	var styles []*types.StyleAttrs
+	for i := range nodes {
+		node := &nodes[i]
+		if node.Style != nil {
+			styles = append(styles, node.Style)
+		}
+		styles = append(styles, collectStyles(node.Children)...)
+	}
+	return styles
+}
+
+// colorRenders reports whether a color string produces any escape code.
+// resolveColor silently yields nothing for an unrecognized value, so an
+// invalid name is indistinguishable from no color at all -- which is exactly
+// what makes a typo like "brightBlue" (the table has "blueBright") invisible.
+func colorRenders(color string, background bool) bool {
+	var withColor, without *types.StyleAttrs
+	if background {
+		withColor = &types.StyleAttrs{Background: color}
+	} else {
+		withColor = &types.StyleAttrs{Color: color}
+	}
+	without = &types.StyleAttrs{}
+	return style.Apply("x", withColor) != style.Apply("x", without)
+}
+
+// Every color named in a shipped preset must resolve. An unresolvable color
+// renders as unstyled text rather than erroring, so nothing else catches it.
+func TestPresetColorsResolve(t *testing.T) {
+	style.SetColorLevel(1)
+
+	for _, name := range List() {
+		nodes := Get(name)
+		if nodes == nil {
+			t.Errorf("%s: failed to load", name)
+			continue
+		}
+		for _, st := range collectStyles(nodes) {
+			if st.Color != "" && !colorRenders(st.Color, false) {
+				t.Errorf("%s: color %q does not resolve", name, st.Color)
+			}
+			if st.Background != "" && !colorRenders(st.Background, true) {
+				t.Errorf("%s: bgcolor %q does not resolve", name, st.Background)
+			}
+		}
+	}
+}
 
 // collectExprs walks a segment tree and returns every expr string in it.
 func collectExprs(nodes []types.SegmentNode) []string {

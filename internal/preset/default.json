@@ -42,6 +42,11 @@
       "style": { "color": "cyan", "prefix": "  ?" }
     },
     {
+      "expr": "agent.name",
+      "when": "agent.active",
+      "style": { "color": "magentaBright", "bold": true, "prefix": "  " }
+    },
+    {
       "expr": "effort.level",
       "when": "effort.level != '' && effort.level != 'medium'",
       "style": { "color": "cyan", "prefix": "  " }

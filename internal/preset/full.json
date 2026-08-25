@@ -71,6 +71,15 @@
             "color": "240",
             "prefix": " "
           }
+        },
+        {
+          "expr": "agent.name",
+          "when": "agent.active",
+          "style": {
+            "color": "magentaBright",
+            "bold": true,
+            "prefix": " \uf2c0 "
+          }
         }
       ]
     },
@@ -246,6 +255,20 @@
             "color": "magenta",
             "prefix": "\uf017 "
           }
+        },
+        {
+          "style": {
+            "prefix": " · "
+          },
+          "children": [
+            {
+              "expr": "session.name",
+              "when": "session.name != ''",
+              "style": {
+                "color": "blueBright"
+              }
+            }
+          ]
         }
       ]
     },

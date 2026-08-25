@@ -144,41 +144,20 @@ func writeTranscript(t *testing.T, lines ...string) string {
 
 func TestSessionProviderName(t *testing.T) {
 	p := &sessionProvider{}
-	path := writeTranscript(t,
-		`{"type":"user","message":{"role":"user","content":"hi"}}`,
-		`{"type":"custom-title","customTitle":"first-name"}`,
-		`{"type":"assistant","message":{"role":"assistant","content":"hello"}}`,
-		`{"type":"custom-title","customTitle":"latest-name"}`,
-		`{"type":"assistant","message":{"role":"assistant","content":"world"}}`,
-	)
-	sess := &types.SessionData{CWD: "/tmp", TranscriptPath: path}
+	sess := &types.SessionData{CWD: "/tmp", SessionName: "auth-refactor"}
 
 	result, err := p.Resolve(sess)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got := sessionValues(result)["name"]; got != "latest-name" {
-		t.Errorf("expected latest-name, got %v", got)
+	if got := sessionValues(result)["name"]; got != "auth-refactor" {
+		t.Errorf("expected auth-refactor, got %v", got)
 	}
 }
 
-func TestSessionProviderNameMissing(t *testing.T) {
-	p := &sessionProvider{}
-	path := writeTranscript(t,
-		`{"type":"user","message":{"role":"user","content":"hi"}}`,
-	)
-	sess := &types.SessionData{CWD: "/tmp", TranscriptPath: path}
-
-	result, err := p.Resolve(sess)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if got := sessionValues(result)["name"]; got != "" {
-		t.Errorf("expected empty name, got %v", got)
-	}
-}
-
-func TestSessionProviderNameNoTranscript(t *testing.T) {
+// session_name is absent for a session with neither a custom name nor an
+// AI-generated title.
+func TestSessionProviderNameAbsent(t *testing.T) {
 	p := &sessionProvider{}
 	sess := &types.SessionData{CWD: "/tmp"}
 	result, err := p.Resolve(sess)
@@ -190,9 +169,17 @@ func TestSessionProviderNameNoTranscript(t *testing.T) {
 	}
 }
 
-func TestSessionProviderNameMissingFile(t *testing.T) {
+// The name comes from stdin only. Scanning the transcript for custom-title
+// entries was O(transcript) on every render, so a transcript containing one
+// must not resurrect that path.
+func TestSessionProviderNameIgnoresTranscript(t *testing.T) {
 	p := &sessionProvider{}
-	sess := &types.SessionData{CWD: "/tmp", TranscriptPath: "/nonexistent/path.jsonl"}
+	path := writeTranscript(t,
+		`{"type":"user","message":{"role":"user","content":"hi"}}`,
+		`{"type":"custom-title","customTitle":"from-transcript"}`,
+	)
+	sess := &types.SessionData{CWD: "/tmp", TranscriptPath: path}
+
 	result, err := p.Resolve(sess)
 	if err != nil {
 		t.Fatal(err)
