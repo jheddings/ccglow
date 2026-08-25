@@ -6,6 +6,8 @@ import "github.com/jheddings/ccglow/internal/types"
 func RegisterBuiltin(registry *Registry) {
 	registry.Register(&pwdProvider{})
 	registry.Register(&gitProvider{})
+	registry.Register(&worktreeProvider{})
+	registry.Register(&workspaceProvider{})
 	registry.Register(&contextProvider{})
 	registry.Register(&modelProvider{})
 	registry.Register(&effortProvider{})

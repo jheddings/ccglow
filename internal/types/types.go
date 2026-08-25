@@ -16,6 +16,44 @@ type SessionData struct {
 	RateLimits     *RateLimits      `json:"rate_limits,omitempty"`
 	SessionName    string           `json:"session_name,omitempty"`
 	Agent          *AgentInfo       `json:"agent,omitempty"`
+	Workspace      *WorkspaceInfo   `json:"workspace,omitempty"`
+	Worktree       *WorktreeInfo    `json:"worktree,omitempty"`
+}
+
+// WorkspaceInfo describes the directories and repository the session runs in.
+type WorkspaceInfo struct {
+	// CurrentDir carries the same value as SessionData.CWD.
+	CurrentDir string `json:"current_dir,omitempty"`
+	// ProjectDir is where Claude Code was launched, which may differ from CWD.
+	ProjectDir string `json:"project_dir,omitempty"`
+	// AddedDirs holds directories added via /add-dir or --add-dir.
+	AddedDirs []string `json:"added_dirs,omitempty"`
+	// GitWorktree names the linked worktree containing the current directory.
+	// Unlike SessionData.Worktree, this is populated for any worktree created
+	// with `git worktree add`, not only --worktree sessions. Absent in the
+	// main working tree.
+	GitWorktree string `json:"git_worktree,omitempty"`
+	// Repo is parsed from the origin remote. Absent outside a git repository
+	// or when no origin remote is configured.
+	Repo *RepoInfo `json:"repo,omitempty"`
+}
+
+// RepoInfo identifies the repository behind the origin remote.
+type RepoInfo struct {
+	Host  string `json:"host"`
+	Owner string `json:"owner"`
+	Name  string `json:"name"`
+}
+
+// WorktreeInfo describes the active worktree. Claude Code sends this only
+// during --worktree sessions. Branch and OriginalBranch are additionally
+// absent for hook-based worktrees.
+type WorktreeInfo struct {
+	Name           string `json:"name,omitempty"`
+	Path           string `json:"path,omitempty"`
+	Branch         string `json:"branch,omitempty"`
+	OriginalCWD    string `json:"original_cwd,omitempty"`
+	OriginalBranch string `json:"original_branch,omitempty"`
 }
 
 // AgentInfo identifies the agent driving the session. Claude Code sends this

@@ -168,6 +168,115 @@ func TestGitRemoteOwnerRepo(t *testing.T) {
 	}
 }
 
+// workspace.repo comes from stdin, so it resolves without git being available
+// at all -- no subprocess, and no dependency on the cwd being a repo.
+func TestGitRepoFromStdin(t *testing.T) {
+	p := &gitProvider{}
+	sess := &types.SessionData{
+		CWD: t.TempDir(),
+		Workspace: &types.WorkspaceInfo{
+			Repo: &types.RepoInfo{Host: "github.com", Owner: "jheddings", Name: "ccglow"},
+		},
+	}
+
+	result, err := p.Resolve(sess)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	git := gitValues(result)
+	if git["owner"] != "jheddings" {
+		t.Errorf("expected owner 'jheddings', got %q", git["owner"])
+	}
+	if git["repo"] != "ccglow" {
+		t.Errorf("expected repo 'ccglow', got %q", git["repo"])
+	}
+	if git["host"] != "github.com" {
+		t.Errorf("expected host 'github.com', got %q", git["host"])
+	}
+}
+
+// stdin wins over the remote when both are available.
+func TestGitRepoStdinOverridesRemote(t *testing.T) {
+	skipWithoutGit(t)
+	dir := initTempRepo(t)
+
+	cmd := exec.Command("git", "remote", "add", "origin", "https://github.com/fromremote/fromremote.git")
+	cmd.Dir = dir
+	if out, err := cmd.CombinedOutput(); err != nil {
+		t.Fatalf("remote add failed: %s", out)
+	}
+
+	p := &gitProvider{}
+	sess := &types.SessionData{
+		CWD: dir,
+		Workspace: &types.WorkspaceInfo{
+			Repo: &types.RepoInfo{Host: "gitlab.com", Owner: "fromstdin", Name: "fromstdin"},
+		},
+	}
+
+	result, err := p.Resolve(sess)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	git := gitValues(result)
+	if git["owner"] != "fromstdin" {
+		t.Errorf("expected owner 'fromstdin', got %q", git["owner"])
+	}
+	if git["repo"] != "fromstdin" {
+		t.Errorf("expected repo 'fromstdin', got %q", git["repo"])
+	}
+}
+
+// workspace.repo is absent outside a repo or with no origin remote, and older
+// Claude Code versions never send it, so the remote parse stays as a fallback.
+func TestGitRepoFallsBackToRemote(t *testing.T) {
+	skipWithoutGit(t)
+	dir := initTempRepo(t)
+
+	cmd := exec.Command("git", "remote", "add", "origin", "https://github.com/fallback/fallbackrepo.git")
+	cmd.Dir = dir
+	if out, err := cmd.CombinedOutput(); err != nil {
+		t.Fatalf("remote add failed: %s", out)
+	}
+
+	p := &gitProvider{}
+	sess := &types.SessionData{CWD: dir, Workspace: &types.WorkspaceInfo{}}
+
+	result, err := p.Resolve(sess)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	git := gitValues(result)
+	if git["owner"] != "fallback" {
+		t.Errorf("expected owner 'fallback', got %q", git["owner"])
+	}
+	if git["host"] != "" {
+		t.Errorf("expected empty host from remote fallback, got %q", git["host"])
+	}
+}
+
+// workspace.git_worktree is populated for any linked worktree, so it replaces
+// the detectWorktree subprocess when present.
+func TestGitWorktreeFromStdin(t *testing.T) {
+	p := &gitProvider{}
+	sess := &types.SessionData{
+		CWD:       t.TempDir(),
+		Workspace: &types.WorkspaceInfo{GitWorktree: "feature-xyz"},
+	}
+
+	result, err := p.Resolve(sess)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if got := gitValues(result)["worktree"]; got != "feature-xyz" {
+		t.Errorf("expected worktree 'feature-xyz', got %q", got)
+	}
+}
+
 func TestGitRemoteSSH(t *testing.T) {
 	skipWithoutGit(t)
 	dir := initTempRepo(t)
