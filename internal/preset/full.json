@@ -220,11 +220,17 @@
           }
         },
         {
-          "expr": "claude.style",
           "style": {
-            "color": "cyan",
             "prefix": " · "
-          }
+          },
+          "children": [
+            {
+              "expr": "claude.style",
+              "style": {
+                "color": "cyan"
+              }
+            }
+          ]
         }
       ]
     },
