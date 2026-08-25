@@ -250,6 +250,7 @@
       ]
     },
     {
+      "when": "term.columns > 140",
       "style": {
         "prefix": " | ",
         "color": "240"
