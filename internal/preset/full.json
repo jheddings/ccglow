@@ -55,11 +55,15 @@
     },
     {
       "style": {
-        "prefix": " | "
+        "prefix": " | ",
+        "color": "240"
       },
       "children": [
         {
-          "expr": "model.name"
+          "expr": "model.name",
+          "style": {
+            "color": "white"
+          }
         },
         {
           "expr": "model.id",
@@ -72,7 +76,8 @@
     },
     {
       "style": {
-        "prefix": " · "
+        "prefix": " | ",
+        "color": "240"
       },
       "children": [
         {
@@ -103,7 +108,8 @@
     },
     {
       "style": {
-        "prefix": " · "
+        "prefix": " | ",
+        "color": "240"
       },
       "children": [
         {
@@ -142,7 +148,8 @@
     },
     {
       "style": {
-        "prefix": " · "
+        "prefix": " | ",
+        "color": "240"
       },
       "children": [
         {
@@ -156,7 +163,8 @@
     },
     {
       "style": {
-        "prefix": " · "
+        "prefix": " | ",
+        "color": "240"
       },
       "children": [
         {
@@ -177,7 +185,8 @@
     },
     {
       "style": {
-        "prefix": " · "
+        "prefix": " | ",
+        "color": "240"
       },
       "children": [
         {
@@ -191,7 +200,8 @@
     },
     {
       "style": {
-        "prefix": " · "
+        "prefix": " | ",
+        "color": "240"
       },
       "children": [
         {
