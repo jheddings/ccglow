@@ -55,3 +55,42 @@ func TestParse_FullData(t *testing.T) {
 		t.Errorf("expected 42%% usage, got %d", s.ContextWindow.UsedPercentage)
 	}
 }
+
+func TestParse_EffortFields(t *testing.T) {
+	input := `{
+		"cwd": "/tmp",
+		"fast_mode": true,
+		"effort": {"level": "xhigh"},
+		"thinking": {"enabled": true}
+	}`
+	s := Parse(input)
+	if s == nil {
+		t.Fatal("expected non-nil session")
+	}
+	if s.Effort == nil || s.Effort.Level != "xhigh" {
+		t.Errorf("expected effort level xhigh, got %+v", s.Effort)
+	}
+	if s.Thinking == nil || !s.Thinking.Enabled {
+		t.Errorf("expected thinking enabled, got %+v", s.Thinking)
+	}
+	if !s.FastMode {
+		t.Error("expected fast mode true")
+	}
+}
+
+// effort is absent when the model does not support the parameter.
+func TestParse_EffortAbsent(t *testing.T) {
+	s := Parse(`{"cwd": "/tmp"}`)
+	if s == nil {
+		t.Fatal("expected non-nil session")
+	}
+	if s.Effort != nil {
+		t.Errorf("expected nil effort, got %+v", s.Effort)
+	}
+	if s.Thinking != nil {
+		t.Errorf("expected nil thinking, got %+v", s.Thinking)
+	}
+	if s.FastMode {
+		t.Error("expected fast mode false")
+	}
+}

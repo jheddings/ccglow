@@ -10,6 +10,20 @@ type SessionData struct {
 	ContextWindow  *ContextWindow   `json:"context_window,omitempty"`
 	Version        string           `json:"version,omitempty"`
 	OutputStyle    *OutputStyleInfo `json:"output_style,omitempty"`
+	Effort         *EffortInfo      `json:"effort,omitempty"`
+	Thinking       *ThinkingInfo    `json:"thinking,omitempty"`
+	FastMode       bool             `json:"fast_mode,omitempty"`
+}
+
+// EffortInfo contains the session's reasoning effort level. Claude Code omits
+// this object entirely when the current model has no effort parameter.
+type EffortInfo struct {
+	Level string `json:"level"`
+}
+
+// ThinkingInfo reports whether extended thinking is enabled.
+type ThinkingInfo struct {
+	Enabled bool `json:"enabled"`
 }
 
 // ModelInfo contains model identification from the session.
