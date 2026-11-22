@@ -3,7 +3,7 @@ module github.com/jheddings/ccglow
 go 1.27.4
 
 require (
-	github.com/expr-lang/expr v1.17.8
+	github.com/expr-lang/expr v1.18.1
 	github.com/mattn/go-runewidth v0.0.31
 	github.com/rs/zerolog v1.35.1
 	github.com/spf13/cobra v1.10.2
